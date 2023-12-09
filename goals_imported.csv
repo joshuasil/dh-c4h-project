@@ -1,0 +1,187 @@
+goal|created_at|updated_at|topic_id|goal_dict|goal_feedback|goal_feedback_dict|goal_es|goal_feedback_es
+"Chat 4 Heart Health has ideas for monitoring your blood sugar & keeping it in a healthy range. Pick 1 of these or write in your own goal for the week to work on managing your cholesterol: 
+(1) Set an alarm on my phone to monitor my blood sugar; 
+(2) Think carefully about what I've been eating when I see a blood sugar reading out of range (too high or too low); 
+(3) Check my blood sugar before each meal every day; 
+(4) I want to decide my own goal."|2023-09-13 00:00:00-06|2023-10-06 11:44:04.090369-06|4|"{""1"":""I will set an alarm on my phone to monitor my blood sugar"", 
+""2"":""I will think carefully about what I've been eating and doing when I see a blood sugar reading out of range (too high or too low)"",
+ ""3"": ""I will check my blood sugar before each meal every day this week"", 
+""4"": ""I want to decide my own goal.""}"|"Tell us how you did on your goal this week in your own words or write in the number from the list here that matches your experience 
+1. I did great! I met my goal; 
+2. I did ok, & mostly met my goal; 
+3. I had a hard time meeting my goal this week. 
+No matter what your answer, the important thing is that you set a goal and made an effort."|"{""1"":""I did great! I met my goal"",
+""2"":""I did ok, and mostly met my goal"",
+""3"":""I had a hard time meeting my goal this week""}"|"Chat del Corazón tiene ideas para monitorear su azúcar en la sangre y mantenerlo en un rango saludable. Elija 1 de estos o escriba en su propio objetivo para la semana para trabajar en la administración de su colesterol:
+(1) Establezca una alarma en mi teléfono para monitorear mi azúcar en la sangre; 
+(2) Piense cuidadosamente sobre lo que he estado comiendo cuando veo un azúcar en la sangre que lee fuera del alcance (demasiado alto o demasiado bajo); (3) Revise mi azúcar en la sangre antes de cada comida todos los días; 
+(4) Quiero decidir mi propio objetivo."|"Cuéntanos cómo lo hiciste en tu objetivo esta semana en tus propias palabras o escribe en el número de la lista aquí que coincida con tu experiencia 
+1. ¡Lo hice genial! Conocí mi objetivo; 
+2. Lo hice bien, y conocí sobre todo mi objetivo; 
+3. Tuve dificultades para cumplir con mi objetivo esta semana. 
+
+No importa cuál sea su respuesta, lo importante es que establezca una meta e hizo un esfuerzo."
+"Chat 4 Heart Health has ideas for monitoring your blood pressure and keeping it in a healthy range. Pick 1 of these or write in your own goal for the week: 
+(1) Buy a home blood pressure monitoring system; 
+(2) Measure my blood pressure 2X every day; 
+(3) Reduce stress by paying attention to my breathing for 5 minutes on 3 days this week; 
+(4) I want to decide my own goal."|2023-09-13 00:00:00-06|2023-10-06 11:44:30.114872-06|6|"{""1"": ""I will look into buying a home blood pressure monitoring system"", 
+""2"": ""I will measure my blood pressure at least 2X every day this week"", 
+""3"": ""I will work on reducing stress by paying attention to my breathing for at least 5 minutes on at least 3 days this week"", 
+""4"": ""I want to decide my own goal.""}"|"Tell us how you did on your goal this week in your own words or write in the number from the list here that matches your experience 
+1. I did great! I met my goal; 
+2. I did ok, & mostly met my goal; 
+3. I had a hard time meeting my goal this week. 
+No matter what your answer, the important thing is that you set a goal and made an effort."|"{""1"":""I did great! I met my goal"",
+""2"":""I did ok, and mostly met my goal"",
+""3"":""I had a hard time meeting my goal this week""}"|"Chat del Corazón tiene ideas para monitorear su presión arterial y mantenerla en un rango saludable. Elija 1 de estos o escriba en su propio objetivo para la semana:
+(1) Compre un sistema de monitoreo de presión arterial doméstica; 
+(2) mida mi presión arterial 2x todos los días; 
+(3) reducir el estrés prestando atención a mi respiración durante 5 minutos en 3 días esta semana; 
+(4) Quiero decidir mi propio objetivo."|"Cuéntanos cómo lo hiciste en tu objetivo esta semana en tus propias palabras o escribe en el número de la lista aquí que coincida con tu experiencia 
+1. ¡Lo hice genial! Conocí mi objetivo; 
+2. Lo hice bien, y conocí sobre todo mi objetivo; 
+3. Tuve dificultades para cumplir con mi objetivo esta semana. 
+
+No importa cuál sea su respuesta, lo importante es que establezca una meta e hizo un esfuerzo."
+"Chat 4 Heart Health wants to help you to get moving this week. Pick one of these or write in your own goal to help your heart with physical activity: 
+(1) I will add 5 minutes of walking to what I normally do each day this week; 
+(2) I will make a date with a friend to go for a 20+ minute walk once this week; 
+(3) I will take 5 minute breaks 3X each day to walk around the house or the block; 
+(4) I want to decide my own goal."|2023-09-13 00:00:00-06|2023-10-06 11:40:40.47706-06|3|"{""1"":""I will add five minutes of walking to what I normally do each day this week"",
+""2"": ""I will make a date with a friend to go for a 20+ minute walk once this week"", 
+""3"": ""I will take five minute breaks 3X each day to walk around the house or the block"",
+""4"":""I want to decide my own goal. ""}"|"Tell us how you did on your goal this week in your own words or write in the number from the list here that matches your experience 
+1. I did great! I met my goal; 
+2. I did ok, & mostly met my goal; 
+3. I had a hard time meeting my goal this week. 
+
+No matter what your answer, the important thing is that you set a goal and made an effort."|"{""1"":""I did great! I met my goal"",
+""2"":""I did ok, and mostly met my goal"",
+""3"":""I had a hard time meeting my goal this week""}"|"Chat del Corazón quiere apoyar su alimentación saludable esta semana. Elija uno de estos o escriba en su propio objetivo para ayudar a su corazón con actividad física:
+(1) Agregaré 5 minutos de caminar a lo que normalmente hago cada día esta semana; 
+(2) Haré una cita con un amigo para caminar más de 20 minutos una vez esta semana; 
+(3) Tomaré los descansos de 5 minutos 3 veces cada día para caminar por la casa o el bloque; 
+(4) Quiero decidir mi propio objetivo."|"Cuéntanos cómo lo hiciste en tu objetivo esta semana en tus propias palabras o escribe en el número de la lista aquí que coincida con tu experiencia 
+1. ¡Lo hice genial! Conocí mi objetivo; 
+2. Lo hice bien, y conocí sobre todo mi objetivo; 
+3. Tuve dificultades para cumplir con mi objetivo esta semana. 
+
+No importa cuál sea su respuesta, lo importante es que establezca una meta e hizo un esfuerzo."
+"Chat 4 Heart Health has ideas for taking charge this week for healthy cholesterol. Pick 1 of these or write in your own goal for the week to work on managing your cholesterol: 
+(1) I will include whole foods like beans and/or whole grains in 3-4 meals; 
+(2) I will eat a vegetable portion with each dinner; 
+(3) I will try to eat at least 5 servings of fruits or vegetables each day; 
+(4) I want to decide my own goal."|2023-09-13 00:00:00-06|2023-10-06 11:43:42.222899-06|2|"{""1"": ""I will include whole foods like beans and/or whole grains in 3-4 meals this week"", 
+""2"": ""I will eat a vegetable portion with each dinner this week"", 
+""3"": ""I will try to eat at least 5 servings of fruits or vegetables each day this week"",
+""4"": ""I want to decide my own goal""}"|"Tell us how you did on your goal this week in your own words or write in the number from the list here that matches your experience 
+1. I did great! I met my goal; 
+2. I did ok, & mostly met my goal; 
+3. I had a hard time meeting my goal this week. 
+No matter what your answer, the important thing is that you set a goal and made an effort."|"{""1"":""I did great! I met my goal"",
+""2"":""I did ok, and mostly met my goal"",
+""3"":""I had a hard time meeting my goal this week""}"|"Chat del Corazón tiene ideas para hacerse cargo esta semana por el colesterol saludable. Elija 1 de estos o escriba en su propio objetivo para la semana para trabajar en la administración de su colesterol:
+(1) incluiré alimentos integrales como frijoles y/o granos integrales en 3-4 comidas; 
+(2) Comeré una porción de verduras con cada cena; 
+(3) Intentaré comer al menos 5 porciones de frutas o verduras cada día; 
+(4) Quiero decidir mi propio objetivo."|"Cuéntanos cómo lo hiciste en tu objetivo esta semana en tus propias palabras o escribe en el número de la lista aquí que coincida con tu experiencia 
+1. ¡Lo hice genial! Conocí mi objetivo; 
+2. Lo hice bien, y conocí sobre todo mi objetivo; 
+3. Tuve dificultades para cumplir con mi objetivo esta semana. 
+
+No importa cuál sea su respuesta, lo importante es que establezca una meta e hizo un esfuerzo."
+"Chat 4 Heart Health wants to support your healthy eating this week. Write in the number from one of the goals here that you will do this week or write in your own goal to help your heart with healthy food: 
+(1) I will add one portion of fruit or vegetable to one meal each day this week; 
+(2) I will include whole grains like brown rice or whole wheat pasta in at least two meals this week;
+ (3) I will use a smaller plate for dinner at least twice as a way to manage my portion size; 
+(4) I want to decide my own goal."|2023-09-20 10:37:46.062479-06|2023-10-06 11:40:30.903561-06|1|"{""1"": ""I will add one portion of fruit or vegetable to one meal each day this week"", 
+""2"": ""I will include whole grains like brown rice or whole wheat pasta in at least two meals this week"", 
+""3"": ""I will use a smaller plate for dinner at least twice as a way to manage my portion size"", 
+""4"": ""I want to decide my own goal""}"|"Tell us how you did on your goal this week in your own words or write in the number from the list here that matches your experience 
+1. I did great! I met my goal; 
+2. I did ok, & mostly met my goal; 
+3. I had a hard time meeting my goal this week. 
+No matter what your answer, the important thing is that you set a goal and made an effort."|"{""1"":""I did great! I met my goal"",
+""2"":""I did ok, and mostly met my goal"",
+""3"":""I had a hard time meeting my goal this week""}"|"Chat del Corazón quiere apoyar su alimentación saludable esta semana. Escriba en el número de uno de los objetivos aquí que hará esta semana o escriba en su propio objetivo para ayudar a su corazón con alimentos saludables: 
+(1) Agregaré una porción de fruta o vegetal a una comida cada día de esta semana; 
+(2) incluiré granos integrales como arroz integral o pasta de trigo integral en al menos dos comidas esta semana; 
+(3) Usaré un plato más pequeño para la cena al menos el doble como una forma de administrar el tamaño de mi porción; 
+(4) Quiero decidir mi propio objetivo."|"Cuéntanos cómo lo hiciste en tu objetivo esta semana en tus propias palabras o escribe en el número de la lista aquí que coincida con tu experiencia 
+1. ¡Lo hice genial! Conocí mi objetivo; 
+2. Lo hice bien, y conocí sobre todo mi objetivo; 
+3. Tuve dificultades para cumplir con mi objetivo esta semana. 
+
+No importa cuál sea su respuesta, lo importante es que establezca una meta e hizo un esfuerzo."
+"Chat 4 Heart Health has some ideas to help you with sleep this week. Pick one of these or write in your own goal to give yourself the gift of restful sleep: 
+(1) I will stop looking at my phone and other screens at least one hour before bed each night; 
+(2) I will cut back on drinking coffee or alcohol in the evenings on at least 2 days this week; 
+(3) I will treat myself to an eye mask and/or foam earplugs and try them out at least once this week; 
+(4) I want to decide my own goal."|2023-09-13 00:00:00-06|2023-10-06 11:41:32.242463-06|5|"{""1"":  ""I will stop looking at my phone and other screens at least one hour before bed each night"", 
+""2"":  ""I will cut back on drinking coffee or alcohol in the evenings on at least 2 days this week"", 
+""3"":  ""I will treat myself to an eye mask and/or foam earplugs and try them out at least once this week"", 
+""4"":  ""I want to decide my own goal.""}"|"Tell us how you did on your goal this week in your own words or write in the number from the list here that matches your experience 
+1. I did great! I met my goal; 
+2. I did ok, & mostly met my goal; 
+3. I had a hard time meeting my goal this week. 
+
+No matter what your answer, the important thing is that you set a goal and made an effort."|"{""1"":""I did great! I met my goal"",
+""2"":""I did ok, and mostly met my goal"",
+""3"":""I had a hard time meeting my goal this week""}"|"Chat del Corazón quiere apoyar su alimentación saludable esta semana. Elija uno de estos o escriba en su propio objetivo para darse el regalo del sueño reparador: 
+(1) Dejaré de mirar mi teléfono y otras pantallas al menos una hora antes de acostarse cada noche; 
+(2) Reduciré el café o el alcohol por las tardes en al menos 2 días esta semana; 
+(3) Me trataré con una máscara para los ojos y/o tapones para los oídos de espuma y los probaré al menos una vez esta semana; 
+(4) Quiero decidir mi propio objetivo."|"Cuéntanos cómo lo hiciste en tu objetivo esta semana en tus propias palabras o escribe en el número de la lista aquí que coincida con tu experiencia 
+1. ¡Lo hice genial! Conocí mi objetivo; 
+2. Lo hice bien, y conocí sobre todo mi objetivo; 
+3. Tuve dificultades para cumplir con mi objetivo esta semana. 
+
+No importa cuál sea su respuesta, lo importante es que establezca una meta e hizo un esfuerzo."
+"Chat 4 Heart Health wants to help you with weight management. Pick 1 of these you think you can do or write in your own goal for the week: 
+(1) I will talk to my family about preparing healthy recipes we all like; 
+(2) I will eat my dinners on a smaller plate as a way to manage portions; 
+(3) I will try to make sure my fork is never full at the same time as my mouth when I eat; 
+(4) I want to decide my own goal."|2023-09-13 00:00:00-06|2023-10-06 11:42:22.460654-06|7|"{""1"": ""I will talk to my family about preparing healthy recipes we all like"", 
+""2"": ""I will eat my dinners on a smaller plate as a way to manage portions"", 
+""3"": ""I will try to make sure my fork is never full at the same time as my mouth when I eat"",
+ ""4"": ""I want to decide my own goal.""}"|"Tell us how you did on your goal this week in your own words or write in the number from the list here that matches your experience 
+1. I did great! I met my goal; 
+2. I did ok, & mostly met my goal; 
+3. I had a hard time meeting my goal this week. 
+
+No matter what your answer, the important thing is that you set a goal and made an effort."|"{""1"":""I did great! I met my goal"",
+""2"":""I did ok, and mostly met my goal"",
+""3"":""I had a hard time meeting my goal this week""}"|"Chat del Corazón quiere ayudarlo con el control de peso. Elija 1 de estos que crea que puede hacer o escribir en su propio objetivo para la semana: 
+(1) Hablaré con mi familia sobre la preparación de recetas saludables que a todos nos gustan; 
+(2) Comeré mis cenas en un plato más pequeño como una forma de administrar porciones; 
+(3) Intentaré asegurarme de que mi horquilla nunca esté lleno al mismo tiempo que mi boca cuando coma; 
+(4) Quiero decidir mi propio objetivo."|"Cuéntanos cómo lo hiciste en tu objetivo esta semana en tus propias palabras o escribe en el número de la lista aquí que coincida con tu experiencia 
+1. ¡Lo hice genial! Conocí mi objetivo; 
+2. Lo hice bien, y conocí sobre todo mi objetivo; 
+3. Tuve dificultades para cumplir con mi objetivo esta semana. 
+
+No importa cuál sea su respuesta, lo importante es que establezca una meta e hizo un esfuerzo."
+"Chat 4 Heart Health wants to help you to set a goal to make it easier to take meds. Pick 1 of these write in your own goal for the week: 
+(1) Buy and use a pill box; 
+(2) Set an alarm on my phone to remind me to take meds; 
+(3) Ask a loved one to remind me; 
+(4) I want to decide my own goal."|2023-09-13 00:00:00-06|2023-10-06 11:45:31.716629-06|8|"{""1"": ""I will buy and use a pill box"", 
+""2"": ""I will set an alarm on my phone to remind me to take meds"", 
+""3"": ""I will ask a loved one to remind me"", 
+""4"": ""I want to decide my own goal.""}"|"Tell us how you did on your goal this week in your own words or write in the number from the list here that matches your experience 
+1. I did great! I met my goal; 
+2. I did ok, & mostly met my goal; 
+3. I had a hard time meeting my goal this week. 
+No matter what your answer, the important thing is that you set a goal and made an effort."|"{""1"":""I did great! I met my goal"",
+""2"":""I did ok, and mostly met my goal"",
+""3"":""I had a hard time meeting my goal this week""}"|"Chat del Corazón quiere ayudarlo a establecer una meta para facilitar la toma de medicamentos. Elija 1 de estos escriba en su propio objetivo para la semana: 
+(1) Compre y use una caja de pastillas; 
+(2) Establezca una alarma en mi teléfono para recordarme que tome medicamentos; 
+(3) Pídale a un ser querido que me recuerde; 
+(4) Quiero decidir mi propio objetivo."|"Cuéntanos cómo lo hiciste en tu objetivo esta semana en tus propias palabras o escribe en el número de la lista aquí que coincida con tu experiencia 
+1. ¡Lo hice genial! Conocí mi objetivo; 
+2. Lo hice bien, y conocí sobre todo mi objetivo; 
+3. Tuve dificultades para cumplir con mi objetivo esta semana. 
+
+No importa cuál sea su respuesta, lo importante es que establezca una meta e hizo un esfuerzo."

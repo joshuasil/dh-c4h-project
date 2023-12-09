@@ -1,0 +1,21 @@
+
+module my_gunicorn 1.0;
+
+require {
+	type user_home_t;
+	type init_t;
+	type httpd_t;
+	class file { execute execute_no_trans ioctl map open read };
+	class lnk_file read;
+	class sock_file write;
+}
+
+#============= httpd_t ==============
+allow httpd_t user_home_t:sock_file write;
+
+#============= init_t ==============
+allow init_t user_home_t:file { execute execute_no_trans ioctl open read };
+
+#!!!! This avc can be allowed using the boolean 'domain_can_mmap_files'
+allow init_t user_home_t:file map;
+allow init_t user_home_t:lnk_file read;
