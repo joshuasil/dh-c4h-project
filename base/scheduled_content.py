@@ -35,26 +35,24 @@ values_to_filter = ["Healthy Eating","Getting Active","Healthy Sleep","Managing 
 #     return week_num, current_weekday
 
 def get_week_num_andcurrent_weekday(created_at):
+    mst = timezone(timedelta(hours=-7))
+    # Convert the datetime to MST
+    created_at = created_at.astimezone(mst)
     # Get current datetime in UTC
     now_utc = datetime.now(pytz.utc)
-    
     # Convert current datetime to the timezone of created_at
     now_in_created_at_tz = now_utc.astimezone(created_at.tzinfo)
-    
     # Calculate the difference in days
-    total_days = (now_in_created_at_tz - created_at).days
-    print(total_days)
+    total_days = (now_in_created_at_tz.date() - created_at.date()).days    
     if total_days <= 0:
         return 0, 0
     else:
         week_num = total_days // 5 + 1
         current_weekday = total_days % 5
         if current_weekday == 0:
-            week_num = total_days // 5
+            week_num -= 1
             current_weekday = 5
-
-    
-    return week_num, current_weekday
+        return week_num, current_weekday
 
 # def get_week_num(created_at):
     
