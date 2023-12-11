@@ -159,6 +159,7 @@ def send_topic_selection_message():
             WeeklyTopic.objects.create(phone_number=phone_number, topic_id=default_topic_id, week_number=week_num)
             Picklist.objects.create(phone_number=phone_number, context='topic_selection', picklist=picklist_json)
             retry_send_message_vonage(message,phone_number, route='outgoing_scheduled_topic_selection')
+            TextMessage.objects.create(phone_number=phone_number, message=message, route='outgoing_scheduled_topic_selection')
             MessageTracker.objects.update_or_create(phone_number=phone_number,week_no = week_num,defaults={'sent_topic_selection_message': True})
             logger.info(f"Sent topic selection message to {phone_number.phone_number} at {datetime.now()}")
         except Exception as e:
@@ -217,6 +218,7 @@ def send_scheduled_message():
                 message = message
             if not getattr(message_tracker, message_tracker_col):
                 retry_send_message_vonage(message,phone_number, route='outgoing_scheduled_info')
+                TextMessage.objects.create(phone_number=phone_number, message=message, route='outgoing_scheduled_info')
                 setattr(message_tracker, message_tracker_col, True)
             message_tracker.save()
             logger.info(f"Sent info message to {phone_number.phone_number} for day {week_num} for topic {weekly_topic_id}")
@@ -258,6 +260,7 @@ def send_goal_message():
             MessageTracker.objects.update_or_create(phone_number=phone_number,week_no = week_num,defaults={'sent_goal_message': True})
             Picklist.objects.update_or_create(phone_number=phone_number, context='goal_setting', picklist=picklist_json)
             retry_send_message_vonage(message,phone_number, route='outgoing_goal_setting')
+            TextMessage.objects.create(phone_number=phone_number, message=message, route='outgoing_goal_setting')
         except Exception as e:
             logger.error(f"Error sending goal message to {phone_number.phone_number}: {e}") 
 
@@ -291,6 +294,7 @@ def send_goal_feedback():
                 message = topic_goal.goal_feedback
             picklist = topic_goal.goal_feedback_dict
             retry_send_message_vonage(message,phone_number, route='outgoing_goal_feedback')
+            TextMessage.objects.create(phone_number=phone_number, message=message, route='outgoing_goal_feedback')
             logger.info(f"Sent goals feedback message to {phone_number.phone_number} for topic {weekly_topic_id}")
             picklist_json = json.dumps(picklist)
             MessageTracker.objects.update_or_create(phone_number=phone_number,week_no = week_num,defaults={'sent_goal_feedback_message': True})
@@ -315,6 +319,7 @@ def send_final_pilot_message():
                 logger.warning(f'Skipping {phone_number.phone_number} because final message already sent')
                 continue
             retry_send_message_vonage(final_message,phone_number, route='outgoing_final_message')
+            TextMessage.objects.create(phone_number=phone_number, message=final_message, route='outgoing_final_message')
             logger.info(f"Sent final message to {phone_number.phone_number}")
             phone_number.final_pilot_message_sent = True
         except Exception as e:

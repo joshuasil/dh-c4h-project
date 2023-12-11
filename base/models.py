@@ -9,12 +9,13 @@ from django.conf import settings
 import vonage
 from django.http import HttpResponse, JsonResponse
 client = vonage.Client(key=settings.VONAGE_KEY, secret=settings.VONAGE_SECRET)
+import time
 
 from .send_message_vonage import *
 
 # Create your models here.
-welcome_message = "Clinic Chat & Denver Health welcome you to Chat 4 Heart Health! We'll send you 4-5 messages every few days on different topics to support healthy habits.  You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please complete this quick survey about your health."
-welcome_message_es = "¡Denver Health le da la bienvenida a Chat del Corazón ! Le enviaremos de 4 a 5 mensajes cada semana durante 4 semanas con temas de mantener su salud. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte saludable. Todo lo que me preguntes se mantendrá privado. Para comenzar, complete esta encuesta rápida sobre su salud."
+welcome_message = "Clinic Chat & Denver Health welcome you to Chat 4 Heart Health! We'll send you 4-5 messages every few days on different topics to support healthy habits.  You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
+welcome_message_es = "¡Clinic Chat y Denver Health le da la bienvenida a Chat del Corazón ! Le enviaremos de 4 a 5 mensajes cada pocos días sobre diferentes temas para fomentar hábitos saludables. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte saludable. Todo lo que me preguntes se mantendrá privado. Para comenzar, complete esta encuesta rápida sobre su salud. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
 class Arm(models.Model):
     name = models.CharField(max_length=100, unique=True, blank=False)
     description = models.TextField(blank=True, null=True)
@@ -46,6 +47,8 @@ class PhoneNumber(models.Model):
     final_pilot_message_sent = models.BooleanField(default=False)
     sub_group = models.BooleanField(default=False)
     language = models.CharField(max_length=2, blank=True, null=True, default="")
+    pre_survey = models.URLField(blank=True, null=True)
+    post_survey = models.URLField(blank=True, null=True)
     
 
     def __str__(self):
@@ -76,6 +79,10 @@ class PhoneNumber(models.Model):
                 else:
                     message = welcome_message
                 success = retry_send_message_vonage(message, self, "sending welcome message", max_retries=3, retry_delay=5)
+                time.sleep(15)
+                if self.pre_survey:
+                    message = self.pre_survey
+                    success = retry_send_message_vonage(message, self, "sending welcome message", max_retries=3, retry_delay=5)
                 if success:
                     self.welcome_sent = True
 

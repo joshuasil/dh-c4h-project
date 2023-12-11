@@ -19,6 +19,11 @@ client = vonage.Client(key=settings.VONAGE_KEY, secret=settings.VONAGE_SECRET, t
 sms = vonage.Sms(client)
 
 def index(request):
+    logger.debug('Debug level log in index view')
+    logger.info('Info level log in index view')
+    logger.warning('Warning level log in index view')
+    logger.error('Error level log in index view')
+    logger.critical('Critical level log in index view')
     return HttpResponse("Hello, world. You're at the home page.")
 
 @csrf_exempt
@@ -31,9 +36,11 @@ def inbound_message(request):
             to_number = data.get('to')         # Receiver's Plivo number
             received_text = data.get('text')
             logger.info(f"Message received: {from_number}, {to_number}, {received_text}")
+            
 
             default_arm = Arm.objects.get(name__iexact="others")  # Replace 1 with the ID of the default arm
             phone_number, _ = PhoneNumber.objects.get_or_create(phone_number=from_number, defaults={'arm': default_arm})
+            TextMessage.objects.create(phone_number=phone_number, message=received_text, route="incoming")
             if received_text.strip().lower() == "heart" and not phone_number.opted_in:
                 # phone_number.opted_in = True
                 # phone_number.save()
