@@ -360,7 +360,7 @@ def get_response_regular_piclist(intent,language,phone_number):
     return response, numbered_dialog, numbered_intents_dict
 
 def get_response_by_intent_language(intent, language, phone_number):
-    logger.info(f"get_response_by_intent_language called for intent: '{intent}' in {language} for phone number: {phone_number.phone_number}")
+    logger.info(f"get_response_by_intent_language called for intent: '{intent}' in {language} for phone number: {phone_number.id}")
     # Filter the DataFrame to get the rows with the specified intent
     filtered_df = df[df['intent'] == intent]
 

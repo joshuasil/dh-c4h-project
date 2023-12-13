@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import logging
+import sentry_sdk
 load_dotenv()
 
 
@@ -23,6 +24,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 #disable registration
 REGISTRATION_OPEN = False
+
+
+sentry_sdk.init(
+    dsn="https://f154d4ccf31360acfca7c160219aaec8@o4505835707957248.ingest.sentry.io/4506385616928768",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -208,10 +221,16 @@ LOGGING = {
             'style': '{',
         },
     },
+    'filters': {
+        'ignore_urls': {
+            '()': 'base.filters.IgnoreUrls',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
+            'filters': ['ignore_urls'],
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
@@ -219,22 +238,26 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 100,  # 10 MB
             'backupCount': 5,
             'formatter': 'verbose',
+            'filters': ['ignore_urls'],
         },
         'db_log': {
             'level': 'DEBUG',
             'class': 'customLogs.db_log_handler.DatabaseLogHandler',
+            'filters': ['ignore_urls'],
         },
 
     },
     'root': {
         'handlers': HANDLER_OPTIONS,
         'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        'filters': ['ignore_urls'],
     },
     'loggers': {
         'django': {
             'handlers': HANDLER_OPTIONS,
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': True,
+            'filters': ['ignore_urls'],
         },
     },
 }
@@ -279,6 +302,12 @@ IBM_LANGUAGE_TRANSLATOR_API = os.getenv('IBM_LANGUAGE_TRANSLATOR_API')
 IBM_LANGUAGE_TRANSLATOR_URL = os.getenv('IBM_LANGUAGE_TRANSLATOR_URL')
 
 
+import re
 
+IGNORABLE_404_URLS = [
+    re.compile(r"^/apple-touch-icon.*\.png$"),
+    re.compile(r"^/favicon\.ico$"),
+    re.compile(r"^/robots\.txt$"),
+]
 
 

@@ -7,7 +7,7 @@ from django.conf import settings
 import time
 import requests
 
-client = vonage.Client(key=settings.VONAGE_KEY, secret=settings.VONAGE_SECRET, timeout=10)
+client = vonage.Client(key=settings.VONAGE_KEY, secret=settings.VONAGE_SECRET, timeout=100)
 sms = vonage.Sms(client)
 
 def splitter(message):
@@ -31,7 +31,7 @@ def send_message_vonage(message, phone_number, route):
         for message_text in splitter(message):
             # Send the message using Vonage SMS
             response_data = sms.send_message({"from": settings.VONAGE_NUMBER, "to": str(phone_number.phone_number), "text": message_text, "type": "unicode"})
-            logger.info(f"rresponse_data: {response_data}")
+            # logger.info(f"Message sent sucessfully")
             if response_data["messages"][0]["status"] == "0":
                 logger.info("Message sent successfully.")
                 

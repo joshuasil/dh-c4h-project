@@ -12,21 +12,9 @@ admin.site.register(WeeklyTopic)
 admin.site.register(TopicGoal)
 admin.site.register(MessageTracker)
 
-# class TextMessageAdmin(admin.ModelAdmin):
-#     # Define a custom method to display the first 50 characters of the 'message' field
-#     def short_message(self, obj):
-#         return obj.message[:50] if obj.message else ''
 
-#     list_display = ('phone_number', 'short_message', 'route', 'messageuuid', 'created_at', 'updated_at')
-#     list_filter = ('route', 'created_at', 'updated_at')
-#     search_fields = ('phone_number__number', 'message', 'messageuuid')
-#     date_hierarchy = 'created_at'
-#     ordering = ('-created_at',)
 
-#     # Set a user-friendly column name for the short_message method
-#     short_message.short_description = 'Message (First 50 Characters)'
-
-class ArmAdmin(admin.ModelAdmin):
+class ArmAdmin(ImportExportModelAdmin):
     list_display = ('name', 'phone_numbers_with_subgroups', 'phone_numbers_without_subgroups')
 
     def phone_numbers_with_subgroups(self, obj):

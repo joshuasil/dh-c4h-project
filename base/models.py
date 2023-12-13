@@ -79,10 +79,12 @@ class PhoneNumber(models.Model):
                 else:
                     message = welcome_message
                 success = retry_send_message_vonage(message, self, "sending welcome message", max_retries=3, retry_delay=5)
+                TextMessage.objects.create(phone_number=self, message=message, route="sending welcome message")
                 time.sleep(15)
                 if self.pre_survey:
                     message = self.pre_survey
                     success = retry_send_message_vonage(message, self, "sending welcome message", max_retries=3, retry_delay=5)
+                    TextMessage.objects.create(phone_number=self, message=message, route="sending pre survey link")
                 if success:
                     self.welcome_sent = True
 

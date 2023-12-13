@@ -19,11 +19,11 @@ client = vonage.Client(key=settings.VONAGE_KEY, secret=settings.VONAGE_SECRET, t
 sms = vonage.Sms(client)
 
 def index(request):
-    logger.debug('Debug level log in index view')
-    logger.info('Info level log in index view')
-    logger.warning('Warning level log in index view')
-    logger.error('Error level log in index view')
-    logger.critical('Critical level log in index view')
+    # logger.debug('Debug level log in index view')
+    # logger.info('Info level log in index view')
+    # logger.warning('Warning level log in index view')
+    # logger.error('Error level log in index view')
+    # logger.critical('Critical level log in index view')
     return HttpResponse("Hello, world. You're at the home page.")
 
 @csrf_exempt
@@ -35,11 +35,12 @@ def inbound_message(request):
             from_number = data.get('msisdn')  # Sender's phone number
             to_number = data.get('to')         # Receiver's Plivo number
             received_text = data.get('text')
-            logger.info(f"Message received: {from_number}, {to_number}, {received_text}")
+            
             
 
             default_arm = Arm.objects.get(name__iexact="others")  # Replace 1 with the ID of the default arm
             phone_number, _ = PhoneNumber.objects.get_or_create(phone_number=from_number, defaults={'arm': default_arm})
+            logger.info(f"Message received: {phone_number.id}, {to_number}, {received_text}")
             TextMessage.objects.create(phone_number=phone_number, message=received_text, route="incoming")
             if received_text.strip().lower() == "heart" and not phone_number.opted_in:
                 # phone_number.opted_in = True
@@ -64,7 +65,7 @@ def inbound_message(request):
             
             if not phone_number.active or arm_name.lower() == "control":
                 return JsonResponse({}, status=200)
-            text_message = TextMessage.objects.create(phone_number=phone_number, message=received_text, route="incoming")
+            # text_message = TextMessage.objects.create(phone_number=phone_number, message=received_text, route="incoming")
             cleaned_text, text_type = clean_and_determine_text_number_or_stop(received_text)
             response, numbered_dialog, numbered_intents_dict, language, context = generate_response(cleaned_text, text_type, phone_number)
             if numbered_dialog != "":
