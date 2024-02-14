@@ -17,23 +17,6 @@ logger = logging.getLogger(__name__)
 
 values_to_filter = ["Healthy Eating","Getting Active","Healthy Sleep","Managing Weight"]
 
-# with codecs.open('base/dialog_eng_es.pickle', 'rb') as file:
-#     dialog_dict = pickle.load(file, encoding='latin1')
-
-
-# def get_week_num_andcurrent_weekday(created_at):
-#     print(type(created_at))
-#     timezone_offset = -7.0  # UTC-07:00 Mountain Time Zone
-#     tzinfo = timezone(timedelta(hours=timezone_offset))
-#     now = datetime.now(tz=created_at.tzinfo)
-#     print(type(now))
-#     week_num = now.hour - created_at.hour
-#     current_weekday = (now.minute // 11)%5
-#     if current_weekday == 0:
-#         current_weekday = 5
-#     logger.info(f"week_num: {week_num},current_weekday: {current_weekday} for {created_at} and {now}")
-#     return week_num, current_weekday
-
 def get_week_num_andcurrent_weekday(created_at):
     mst = timezone(timedelta(hours=-7))
     # Convert the datetime to MST
@@ -54,14 +37,6 @@ def get_week_num_andcurrent_weekday(created_at):
             current_weekday = 5
         return week_num, current_weekday
 
-# def get_week_num(created_at):
-    
-#     timezone_offset = -7.0  # UTC-07:00 Mountain Time Zone
-#     tzinfo = timezone(timedelta(hours=timezone_offset))
-#     now = datetime.now(tz=created_at.tzinfo)
-#     week_num = now.hour - created_at.hour
-#     logger.info(f"week_num: {week_num} for {created_at} and {now}")
-#     return week_num
 
 def get_week_num(created_at):
     # Get current datetime in UTC
@@ -95,6 +70,12 @@ def send_topic_selection_message():
             topic_num = week_num*2
         else:
             topic_num = week_num*2-1
+        try:
+            if MessageTracker.objects.filter(phone_number=phone_number, week_no=week_num)[0]:
+                logger.info(f'Skipping {phone_number.id} because topic already assigned for week {week_num}')
+                continue
+        except IndexError:
+            pass
         logger.info(f"Assigning topic number {topic_num} to {phone_number.id}")
         WeeklyTopic.objects.create(phone_number=phone_number, topic_id=topic_num, week_number=week_num)
         logger.info(f"Updated message tracker for {phone_number.id}")
@@ -134,12 +115,12 @@ def send_topic_selection_message():
                 picklist = {str(topic_info['id']): topic_info['name_es'] for topic_info in topic_info_not_in_weekly_topic}
                 default_topic_id = min(picklist.keys())
                 default_topic_name = picklist[default_topic_id]
-                pre_message = f'Hola, Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}. Si prefiere un tema diferente, escriba el número del tema que prefiere de esta lista:\n'
+                pre_message = f'Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}. Si prefiere un tema diferente, escriba el número del tema que prefiere de esta lista:\n'
                 if topic_info_not_in_weekly_topic.count()<=1:
-                    pre_message = f'Hola, Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}.\n'
+                    pre_message = f'Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}.\n'
                     message = ""
                 else:
-                    pre_message = f'Hola, Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}. Si prefiere un tema diferente, escriba el número del tema que prefiere de esta lista:\n'
+                    pre_message = f'Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}. Si prefiere un tema diferente, escriba el número del tema que prefiere de esta lista:\n'
                     message = '\n'.join([f"{topic_id}. {topic_name}" for topic_id, topic_name in picklist.items() if topic_id != min(picklist.keys())])
                 message = pre_message + message
             else:
@@ -149,16 +130,16 @@ def send_topic_selection_message():
                 default_topic_name = picklist[default_topic_id]
                 
                 if topic_info_not_in_weekly_topic.count()<=1:
-                    pre_message = f'Hi, Chat 4 Heart Health is sending you messages over the next few days about {default_topic_name}.\n'
+                    pre_message = f'Chat 4 Heart Health is sending you messages over the next few days about {default_topic_name}.\n'
                     message = ""
                 else:
-                    pre_message = f'Hi, Chat 4 Heart Health is sending you messages over the next few days about {default_topic_name}. If you prefer a different topic, write the number of the topic you prefer from this list:\n'
+                    pre_message = f'Chat 4 Heart Health is sending you messages over the next few days about {default_topic_name}. If you prefer a different topic, write the number of the topic you prefer from this list:\n'
                     message = '\n'.join([f"{topic_id}. {topic_name}" for topic_id, topic_name in picklist.items() if topic_id != min(picklist.keys())])
                 message = pre_message + message
             picklist_json = json.dumps(picklist)
+            retry_send_message_vonage(message,phone_number, route='outgoing_scheduled_topic_selection')
             WeeklyTopic.objects.create(phone_number=phone_number, topic_id=default_topic_id, week_number=week_num)
             Picklist.objects.create(phone_number=phone_number, context='topic_selection', picklist=picklist_json)
-            retry_send_message_vonage(message,phone_number, route='outgoing_scheduled_topic_selection')
             TextMessage.objects.create(phone_number=phone_number, message=message, route='outgoing_scheduled_topic_selection')
             MessageTracker.objects.update_or_create(phone_number=phone_number,week_no = week_num,defaults={'sent_topic_selection_message': True})
             logger.info(f"Sent topic selection message to {phone_number.id} at {datetime.now()}")
@@ -214,10 +195,12 @@ def send_scheduled_message():
                     numbered_dialog = '\n'.join([f"{i}. {dialog}" for i, dialog in convert_str_to_dict(picklist_json).items()])
                     logger.info(f"numbered_dialog: {numbered_dialog}")
                 message = message + '\n' + numbered_dialog
+                include_name = True
             else:
                 message = message
+                include_name = False
             if not getattr(message_tracker, message_tracker_col):
-                retry_send_message_vonage(message,phone_number, route='outgoing_scheduled_info')
+                retry_send_message_vonage(message,phone_number, route='outgoing_scheduled_info',include_name=include_name)
                 TextMessage.objects.create(phone_number=phone_number, message=message, route='outgoing_scheduled_info')
                 setattr(message_tracker, message_tracker_col, True)
             message_tracker.save()
@@ -258,7 +241,7 @@ def send_goal_message():
             logger.info(f"Sent goals message to {phone_number.id} for topic {weekly_topic_id}")
             picklist_json = json.dumps(picklist)
             MessageTracker.objects.update_or_create(phone_number=phone_number,week_no = week_num,defaults={'sent_goal_message': True})
-            Picklist.objects.update_or_create(phone_number=phone_number, context='goal_setting', picklist=picklist_json)
+            Picklist.objects.create(phone_number=phone_number, context='goal_setting', picklist=picklist_json)
             retry_send_message_vonage(message,phone_number, route='outgoing_goal_setting')
             TextMessage.objects.create(phone_number=phone_number, message=message, route='outgoing_goal_setting')
         except Exception as e:
@@ -298,11 +281,14 @@ def send_goal_feedback():
             logger.info(f"Sent goals feedback message to {phone_number.id} for topic {weekly_topic_id}")
             picklist_json = json.dumps(picklist)
             MessageTracker.objects.update_or_create(phone_number=phone_number,week_no = week_num,defaults={'sent_goal_feedback_message': True})
-            Picklist.objects.update_or_create(phone_number=phone_number, context='goal_feedback', picklist=picklist_json)
+            Picklist.objects.create(phone_number=phone_number, context='goal_feedback', picklist=picklist_json)
         except Exception as e:
             logger.error(f"Error sending goal feedback message to {phone_number.id}: {e}")
 
-final_message = "Denver Health thanks you for being a part of Chat 4 Heart Health! Feel free to keep chatting with us about healthy habits. Please take a few minutes now to complete this quick follow-up survey about your health."
+final_message_control = settings.FINAL_MESSAGE_CONTROL
+final_message_control_es = settings.FINAL_MESSAGE_CONTROL_ES
+final_message = settings.FINAL_MESSAGE
+final_message_es = settings.FINAL_MESSAGE_ES
 def send_final_pilot_message():
     phone_numbers = PhoneNumber.objects.filter(Q(arm__name__icontains="ai_chat") | Q(arm__name__icontains="control"))
     logger.info(f'Found {phone_numbers.count()} phone numbers')
@@ -318,9 +304,29 @@ def send_final_pilot_message():
             if phone_number.final_pilot_message_sent:
                 logger.warning(f'Skipping {phone_number.id} because final message already sent')
                 continue
-            retry_send_message_vonage(final_message,phone_number, route='outgoing_final_message')
+            if phone_number.language == "es" and phone_number.arm.name == "control":
+                final_message = settings.FINAL_MESSAGE_CONTROL_ES
+                retry_send_message_vonage(final_message,phone_number, route='outgoing_final_message',include_name=False)
+            elif phone_number.language == "es" and phone_number.arm.name != "control":
+                final_message = settings.FINAL_MESSAGE_ES
+                retry_send_message_vonage(final_message,phone_number, route='outgoing_final_message')
+            elif phone_number.arm.name != "control":
+                final_message = settings.FINAL_MESSAGE
+                retry_send_message_vonage(final_message,phone_number, route='outgoing_final_message')
+            else:
+                final_message = settings.FINAL_MESSAGE_CONTROL
+                retry_send_message_vonage(final_message,phone_number, route='outgoing_final_message',include_name=False)
+            
             TextMessage.objects.create(phone_number=phone_number, message=final_message, route='outgoing_final_message')
+            time.sleep(10)
+            try:
+                post_survey_link = phone_number.post_survey
+                retry_send_message_vonage(post_survey_link,phone_number, route='outgoing_post_survey_link',include_name=False)
+                TextMessage.objects.create(phone_number=phone_number, message=post_survey_link, route='outgoing_post_survey_link')
+            except:
+                pass
             logger.info(f"Sent final message to {phone_number.id}")
             phone_number.final_pilot_message_sent = True
+            phone_number.save()
         except Exception as e:
             logger.error(f"Error sending final message to {phone_number.id}: {e}")

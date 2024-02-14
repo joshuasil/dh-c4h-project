@@ -1,6 +1,6 @@
 import re
 import random
-from .models import TextMessage, PhoneNumber,Picklist, MessageTracker, WeeklyTopic, Topic
+from .models import PhoneNumber,Picklist, MessageTracker, WeeklyTopic, Topic
 import sys
 import calendar
 import vonage
@@ -26,19 +26,19 @@ from .send_message_vonage import *
 logger = logging.getLogger(__name__)
 
 # Load the dictionary from the pickle file
-with open('base/intent_dict.pkl', 'rb') as file:
-    intent_dict = pickle.load(file)
+with open('base/intent_dict.json', 'rb') as file:
+    intent_dict = json.load(file)
 
-with codecs.open('base/intent_dict_es.pkl', 'rb') as file:
-    intent_dict_es = pickle.load(file, encoding='latin1')
+with codecs.open('base/intent_dict_es.json', 'rb') as file:
+    intent_dict_es = json.load(file)
 
-with open('base/azure_intent.pkl', 'rb') as file:
-    azure_intent = pickle.load(file)
+with open('base/azure_intent.json', 'rb') as file:
+    azure_intent = json.load(file)
 
-with open('base/dialog_eng_es.pickle', 'rb') as file:
-    dialog_dict = pickle.load(file)
+with open('base/dialog_eng_es.json', 'rb') as file:
+    dialog_dict = json.load(file)
 
-df = pd.read_excel('base/responses.xlsx',engine='openpyxl')
+df = pd.read_excel('responses.xlsx',engine='openpyxl')
 
 
 client = vonage.Client(key=settings.VONAGE_KEY, secret=settings.VONAGE_SECRET, timeout=10)
@@ -300,7 +300,7 @@ def generate_response(received_text, text_type, phone_number):
         route = "opt_in_confirmation"
         phone_number.opted_in = True
         # send_message_vonage(response, phone_number, route)
-        TextMessage.objects.create(phone_number=phone_number, message=response, route=route)
+        # TextMessage.objects.create(phone_number=phone_number, message=response, route=route)
     else:
         context = "regular"
         # Get a response based on the received text using an external function (defined elsewhere)
@@ -394,19 +394,19 @@ def get_response_by_intent_language(intent, language, phone_number):
         response = filtered_row['response_es']
         response_1 = filtered_row['response_1_es']
         numbered_dialog = '\n'.join([f'{i + 1}. {intent}' for i, intent in enumerate(related_dialog_es)])
-        numbered_dialog = response_1 + '\n\n' + 'Pregúntame sobre otra cosa:\n' + numbered_dialog
+        numbered_dialog = str(response_1) + '\n\n' + 'Pregúntame sobre otra cosa:\n' + str(numbered_dialog)
 
     elif language == 'en' or language =="":
         # Set the response and related intents for English language
         response = filtered_row['response']
         numbered_dialog = '\n'.join([f'{i + 1}. {intent}' for i, intent in enumerate(related_dialog_en)])
-        numbered_dialog = 'Ask me about something else:\n' + numbered_dialog
+        numbered_dialog = 'Ask me about something else:\n' + str(numbered_dialog)
     else:
         # Set the response and related intents for non-English languages
         response = filtered_row['response_es']
         response_1 = filtered_row['response_1_es']
         numbered_dialog = '\n'.join([f'{i + 1}. {intent}' for i, intent in enumerate(related_dialog_es)])
-        numbered_dialog = response_1 + '\n\n' + 'Pregúntame sobre otra cosa:\n' + numbered_dialog
+        numbered_dialog = str(response_1) + '\n\n' + 'Pregúntame sobre otra cosa:\n' + str(numbered_dialog)
 
     logger.info(f"Response generated for intent '{intent}' in {language}.")
     return response, numbered_dialog, numbered_intents_dict
@@ -486,7 +486,7 @@ def get_prediction_render(text, language, phone_number):
 
     # Get the corresponding probabilities
     if language == 'en':
-        top_dialogs = [intent_dict[intent] for intent in top_intents]
+        top_dialogs = [intent_dict[intent] for intent in top_intents][:3]
         response_text = 'Are you asking about: \n' + ('\n'.join([f'{i + 1}. {intent}' for i, intent in enumerate(top_dialogs)]))
     else:
         top_dialogs = [intent_dict_es[intent] for intent in top_intents]
@@ -500,6 +500,7 @@ def get_prediction_render(text, language, phone_number):
 def get_prediction_azure(text, language, phone_number):
     logger.info(f"get_prediction called for {text}")
     url = "https://clinic-chat-test.cognitiveservices.azure.com/language/:analyze-conversations?api-version=2022-10-01-preview"
+    
 
     headers = {
         "Ocp-Apim-Subscription-Key": "f0786e002e9d4917b4af22bdf22e6dc3",
@@ -522,9 +523,9 @@ def get_prediction_azure(text, language, phone_number):
         }
     },
     "parameters": {
-        "projectName": "Chat4HeartHealth",
+        "projectName": "Chat4Heart-Josh-test",
         "verbose": True,
-        "deploymentName": "Chat4HeartHealth",
+        "deploymentName": "c4h",
         "stringIndexType": "TextElement_V8"
     }
 }
@@ -540,7 +541,7 @@ def get_prediction_azure(text, language, phone_number):
 
     # Get the corresponding probabilities
     if language == 'en':
-        top_dialogs = [intent_dict[intent] for intent in top_intents]
+        top_dialogs = [intent_dict[intent] for intent in top_intents][:3]
         response_text = 'Are you asking about: \n' + ('\n'.join([f'{i + 1}. {intent}' for i, intent in enumerate(top_dialogs)]))
     else:
         top_dialogs = [intent_dict_es[intent] for intent in top_intents]

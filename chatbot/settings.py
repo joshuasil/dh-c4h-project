@@ -15,25 +15,74 @@ import os
 from dotenv import load_dotenv
 import logging
 import sentry_sdk
-load_dotenv()
+import boto3
+import socket
+from boto3.session import Session
+
+
+hostname = socket.gethostname()
+
+if 'D2V-SilvasstarMBP' in hostname:
+    environment = 'dev'
+    print("Running on local machine")
+else:
+    environment = 'prod'
+    print("Running on production server")
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+if environment == "dev":
+    dotenv_path = BASE_DIR / '.env'
+    AWS_LOG_GROUP = "Chat4Heart"
+    AWS_LOG_STREAM = "Chat4Heart-StridePilotTestingStream-dev"
+    AWS_LOGGER_NAME = 'Chat4Heart-watchtower-logger-StridePilotTesting-dev'
+else:
+    dotenv_path = BASE_DIR.parent / '.env'
+    AWS_LOG_GROUP = "Chat4Heart"
+    AWS_LOG_STREAM = "StridePilotTestingStream-prod"
+    AWS_LOGGER_NAME = 'watchtower-logger-StridePilotTesting-prod'
+
+# Load the .env file
+load_dotenv(dotenv_path=dotenv_path)
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_KMS_ARN = os.getenv('AWS_KMS_ARN')
+AWS_REGION_NAME = os.getenv('AWS_REGION_NAME', 'us-east-1')
+
+WELCOME_MESSAGE_CONTROL = "Your healthcare provider is sending you three messages each week for the next 2 months to help you manage your health. Look for them every couple of days starting next week. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
+WELCOME_MESSAGE_CONTROL_ES = "Su proveedor de atención médica le enviará tres mensajes cada semana durante los próximos 2 meses para ayudarlo a controlar su salud. Búscalos cada dos o tres días a partir de la próxima semana. Para comenzar, complete esta encuesta rápida sobre su salud. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
+WELCOME_MESSAGE="Clinic Chat & Salud welcome you to Chat 4 Heart Health! We'll send you 4-5 messages every few days on different topics to support healthy habits.  You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
+WELCOME_MESSAGE_ES="¡Clinic Chat y Salud le da la bienvenida a Chat del Corazón ! Le enviaremos de 4 a 5 mensajes cada pocos días sobre diferentes temas para fomentar hábitos saludables. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte saludable. Todo lo que me preguntes se mantendrá privado. Para comenzar, complete esta encuesta rápida sobre su salud. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
+FINAL_MESSAGE_CONTROL = "Salud thanks you for being a part of Chat 4 Heart Health! Please take a few minutes now to complete this quick follow-up survey about your health."
+FINAL_MESSAGE_CONTROL_ES = "¡Salud le agradece por ser parte de Chat del Corazón ! Tómese unos minutos ahora para completar esta rápida encuesta de seguimiento sobre su salud."
+FINAL_MESSAGE = "Salud thanks you for being a part of Chat 4 Heart Health! Feel free to keep chatting with us about healthy habits. Please take a few minutes now to complete this quick follow-up survey about your health."
+FINAL_MESSAGE_ES = "¡Salud le agradece por ser parte de Chat del Corazón ! No dudes en seguir charlando con nosotros sobre hábitos saludables. Tómese unos minutos ahora para completar esta rápida encuesta de seguimiento sobre su salud."
+print("WELCOME_MESSAGE: ", WELCOME_MESSAGE)
+print("WELCOME_MESSAGE_ES: ", WELCOME_MESSAGE_ES)
 
 #disable registration
 REGISTRATION_OPEN = False
 
 
+logger_boto3_client = boto3.client(
+    "logs",
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    region_name=AWS_REGION_NAME,
+)
+
+# Choose the DSN based on the environment
+if environment == "dev":
+    dsn = "https://6c354df327d274cee17b78ed5784bea3@o4505835707957248.ingest.sentry.io/4506515913572352"
+else:
+    dsn = "https://3ff61de170e72b5dbf67ed3c7d4213f2@o4505835707957248.ingest.sentry.io/4506515865796608"
+
 sentry_sdk.init(
-    dsn="https://f154d4ccf31360acfca7c160219aaec8@o4505835707957248.ingest.sentry.io/4506385616928768",
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
+    dsn=dsn,
     traces_sample_rate=1.0,
-    # Set profiles_sample_rate to 1.0 to profile 100%
-    # of sampled transactions.
-    # We recommend adjusting this value in production.
     profiles_sample_rate=1.0,
 )
 
@@ -48,7 +97,7 @@ DEBUG = True
 CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = [
-'localhost','140.226.4.14','dh.chat4heart.ucdenver.edu','127.0.0.1'
+'localhost','3.211.47.166','dh-c4h.clinicchat.com','127.0.0.1'
 ]
 
 
@@ -70,6 +119,7 @@ INSTALLED_APPS = [
     'import_export',
     'customLogs',
     'django_extensions',
+    'rangefilter',
 ]
 
 MIDDLEWARE = [
@@ -112,16 +162,29 @@ WSGI_APPLICATION = 'chatbot.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+if environment == "dev":
+    POSTGRES_HOST = 'localhost'
+    POSTGRES_PORT = '5432'
+    POSTGRES_USERNAME = os.getenv('POSTGRES_USERNAME_DEV', None)
+    POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD_DEV', None)
+
+else:
+    POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
+    POSTGRES_PORT = '5434'
+    POSTGRES_USERNAME = os.getenv('POSTGRES_USERNAME', None)
+    POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD', None)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_test',
-        'USER': 'silvassj',
-        'PASSWORD': 'HcBPwiXIu8mnP10I',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': os.getenv('POSTGRES_DATABASE', None),
+        'USER': POSTGRES_USERNAME,
+        'PASSWORD': POSTGRES_PASSWORD,
+        'HOST': POSTGRES_HOST,
+        'PORT': POSTGRES_PORT,
     }
 }
+
 
 ADMINS = [
     # ('Joshua Silvasstar', 'joshva.silvasstar@clinicchat.com'),
@@ -211,7 +274,11 @@ DEFAULT_TO_EMAIL = [
                     ]
 
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'debug.log')
-HANDLER_OPTIONS = ['console', 'file', 'db_log']
+HANDLER_OPTIONS = ['console', 'file', 
+                #    'db_log',
+                #    'watchtower',
+                   ]
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -245,6 +312,16 @@ LOGGING = {
             'class': 'customLogs.db_log_handler.DatabaseLogHandler',
             'filters': ['ignore_urls'],
         },
+        'watchtower': {
+            "level": "INFO",
+            "class": "watchtower.CloudWatchLogHandler",
+            "boto3_client": logger_boto3_client,
+            "log_group": AWS_LOG_GROUP,
+            # Different stream for each environment
+            "stream_name": AWS_LOG_STREAM,
+            "formatter": "verbose",
+            'filters': ['ignore_urls'],
+        },
 
     },
     'root': {
@@ -263,7 +340,6 @@ LOGGING = {
 }
 
 
-
 SCHEDULER_CONFIG = {
     "apscheduler.jobstores.default": {
         "class": "django_apscheduler.jobstores:DjangoJobStore"
@@ -275,10 +351,10 @@ SCHEDULER_CONFIG = {
 SCHEDULER_AUTOSTART = True
 SCHEDULER_SETTING = os.environ.get('SCHEDULER_SETTING')
 
-WELCOME_MESSAGE = os.getenv('WELCOME_MESSAGE', None)
+# WELCOME_MESSAGE = os.getenv('WELCOME_MESSAGE', None)
 OPT_IN_MESSAGE = os.getenv('OPT_IN_MESSAGE', None)
 OPT_IN_MESSAGE_ES = os.getenv('OPT_IN_MESSAGE_ES', None)
-WELCOME_MESSAGE_ES = os.getenv('WELCOME_MESSAGE_ES', None)
+# WELCOME_MESSAGE_ES = os.getenv('WELCOME_MESSAGE_ES', None)
 TOTAL_TOPICS = os.getenv('TOTAL_TOPICS', 8)
 
 SCHEDULE_MESSAGE_HOUR = os.getenv('SCHEDULE_MESSAGE_HOUR', 8)
@@ -292,6 +368,7 @@ TARGET_ARM_NAME = os.getenv('TARGET_ARM_NAME', 'test')
 VONAGE_KEY=os.getenv('VONAGE_KEY', None)
 VONAGE_SECRET=os.getenv('VONAGE_SECRET', None)
 VONAGE_NUMBER=os.getenv('VONAGE_NUMBER','18334298629')
+print("VONAGE_NUMBER: ", VONAGE_NUMBER)
 
 WATSON_API_KEY = os.getenv('WATSON_API_KEY')
 WATSON_ASSISTANT_ID = os.getenv('WATSON_ASSISTANT_ID')
@@ -310,4 +387,9 @@ IGNORABLE_404_URLS = [
     re.compile(r"^/robots\.txt$"),
 ]
 
+AWS_SES_ACCESS_KEY_ID = os.getenv('AWS_SES_ACCESS_KEY_ID')
+AWS_SES_SECRET_ACCESS_KEY = os.getenv('AWS_SES_SECRET_ACCESS_KEY')
 
+EMAIL_BACKEND = 'django_ses.SESBackend'
+AWS_SES_REGION_NAME = 'us-east-1'
+AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'

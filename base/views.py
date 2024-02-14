@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 import logging
 from .models import PhoneNumber, Arm, ScheduledMessage, TextMessage, Topic
 from .helper_functions import *
@@ -10,6 +11,8 @@ timezone.localtime(timezone.now())
 import json
 import csv
 import traceback
+import hashlib
+from .aws_kms_functions import *
 logger = logging.getLogger(__name__)
 
 # Create your views here.
@@ -18,13 +21,9 @@ import vonage
 client = vonage.Client(key=settings.VONAGE_KEY, secret=settings.VONAGE_SECRET, timeout=10)
 sms = vonage.Sms(client)
 
-def index(request):
-    # logger.debug('Debug level log in index view')
-    # logger.info('Info level log in index view')
-    # logger.warning('Warning level log in index view')
-    # logger.error('Error level log in index view')
-    # logger.critical('Critical level log in index view')
-    return HttpResponse("Hello, world. You're at the home page.")
+@login_required
+def home(request):
+    return render(request, 'base/home.html')
 
 @csrf_exempt
 def inbound_message(request):
@@ -35,17 +34,27 @@ def inbound_message(request):
             from_number = data.get('msisdn')  # Sender's phone number
             to_number = data.get('to')         # Receiver's Plivo number
             received_text = data.get('text')
-            
-            
+            from_number_hash = hashlib.sha256(from_number.encode()).hexdigest()
+            from django.db import IntegrityError
 
-            default_arm = Arm.objects.get(name__iexact="others")  # Replace 1 with the ID of the default arm
-            phone_number, _ = PhoneNumber.objects.get_or_create(phone_number=from_number, defaults={'arm': default_arm})
+            try:
+                phone_number = PhoneNumber.objects.get(phone_number_hash=from_number_hash)
+            except PhoneNumber.DoesNotExist:
+                default_arm, created = Arm.objects.get_or_create(name="others")
+                phone_number_instance = PhoneNumber(phone_number=from_number, arm=default_arm)
+                phone_number_instance.save()
+                phone_number = PhoneNumber.objects.get(phone_number_hash=from_number_hash)
+            print("created phone number")
             logger.info(f"Message received: {phone_number.id}, {to_number}, {received_text}")
             TextMessage.objects.create(phone_number=phone_number, message=received_text, route="incoming")
-            if received_text.strip().lower() == "heart" and not phone_number.opted_in:
+            if received_text.strip().lower() in ["heart", "corazón", "yes"] and not phone_number.opted_in:
                 # phone_number.opted_in = True
                 # phone_number.save()
-                response = "Thank you for opting for this study. The team is working on setting you up. You will receive a welcome message as soon as you are set up."
+                if received_text.strip().lower() in ["heart", "yes"]:
+                    response = "Thank you for opting for this study. The team is working on setting you up. You will receive a welcome message as soon as you are set up."
+                if received_text.strip().lower() == "corazón":
+                    response = "Gracias por optar por este estudio. El equipo está trabajando para configurarlo. Recibirá un mensaje de bienvenida tan pronto como esté configurado."
+                    phone_number.language = "es"
                 success = retry_send_message_vonage(response, phone_number, route='outgoing_opt_in')
                 TextMessage.objects.create(phone_number=phone_number, message=response, route='outgoing_opt_in')
                 phone_number, _ = PhoneNumber.objects.get_or_create(phone_number="17204001070", defaults={'arm': default_arm})
@@ -61,6 +70,7 @@ def inbound_message(request):
                 response = "Thank you for your interest in Chat 4 Heart Health! As of right now, you are doing well managing your health so we won't be sending you text messages. If your health care provider suggests you could benefit from our program, we'll start sending you text messages to support healthy behavior. Thanks, and have a great day."
                 success = retry_send_message_vonage(response, phone_number, route='outgoing_other_arm')
                 if success:
+                    TextMessage.objects.create(phone_number=phone_number, message=response, route='outgoing_other_arm')
                     return JsonResponse({"response": response}, status=200)
             
             if not phone_number.active or arm_name.lower() == "control":
@@ -73,6 +83,7 @@ def inbound_message(request):
             success = retry_send_message_vonage(response, phone_number, route='outgoing_selection_'+context)
             if success:
                 # Message sent successfully
+                TextMessage.objects.create(phone_number=phone_number, message=response, route='outgoing_selection_'+context)
                 return JsonResponse({"response": response}, status=200)
             else:
                 # All retry attempts failed
