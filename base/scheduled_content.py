@@ -15,7 +15,6 @@ import pytz
 
 logger = logging.getLogger(__name__)
 
-values_to_filter = ["Healthy Eating","Getting Active","Healthy Sleep","Managing Weight"]
 
 def get_week_num_andcurrent_weekday(created_at):
     mst = timezone(timedelta(hours=-7))
@@ -55,21 +54,18 @@ def get_week_num(created_at):
 
 
 def send_topic_selection_message():
-    phone_numbers = PhoneNumber.objects.filter(arm__name__icontains="control")
+    phone_numbers = PhoneNumber.objects.filter(arm__name__icontains="control",study_completed=False)
     logger.info(f'Found {phone_numbers.count()} phone numbers with arm name control')
     for phone_number in phone_numbers:
         week_num,current_weekday = get_week_num_andcurrent_weekday(phone_number.created_at)
 
-        if week_num > int(4):
+        if week_num > int(settings.TOTAL_TOPICS) or week_num <= 0:
             logger.info(f'Skipping {phone_number.id} because it is week {week_num}')
             continue
         if current_weekday != int(1):
             logger.info(f'Skipping {phone_number.id} because it is weekday {current_weekday}')
             continue
-        if phone_number.sub_group:
-            topic_num = week_num*2
-        else:
-            topic_num = week_num*2-1
+        topic_num = week_num
         try:
             if MessageTracker.objects.filter(phone_number=phone_number, week_no=week_num)[0]:
                 logger.info(f'Skipping {phone_number.id} because topic already assigned for week {week_num}')
@@ -80,7 +76,7 @@ def send_topic_selection_message():
         WeeklyTopic.objects.create(phone_number=phone_number, topic_id=topic_num, week_number=week_num)
         logger.info(f"Updated message tracker for {phone_number.id}")
         MessageTracker.objects.update_or_create(phone_number=phone_number,week_no = week_num,defaults={'sent_topic_selection_message': False})
-    phone_numbers = PhoneNumber.objects.filter(arm__name__icontains="ai_chat")
+    phone_numbers = PhoneNumber.objects.filter(arm__name__icontains="ai_chat",study_completed=False)
     logger.info(f'Found {phone_numbers.count()} phone numbers with arm name ai_chat')
     for phone_number in phone_numbers:
         try:
@@ -89,7 +85,7 @@ def send_topic_selection_message():
             # day_count_dict = weekday_count(phone_number.created_at,get_datetime_now())
             week_num,current_weekday = get_week_num_andcurrent_weekday(phone_number.created_at)
             logger.info(f"Current hour for {phone_number.id}: {week_num}")
-            if week_num > int(4) or week_num <= 0:
+            if week_num > int(8) or week_num <= 0:
                 logger.info(f'Skipping {phone_number.id} because it is week {week_num}')  
                 continue
             if current_weekday != int(1):
@@ -103,18 +99,14 @@ def send_topic_selection_message():
                 pass
             topics_in_weekly_topic = WeeklyTopic.objects.filter(phone_number=phone_number).values_list('topic__id', flat=True)
             logger.info("fetched already completed topics")
+            topics_in_weekly_topic = WeeklyTopic.objects.filter(phone_number=phone_number).values_list('topic__id', flat=True)
             topics_not_in_weekly_topic = Topic.objects.exclude(id__in=topics_in_weekly_topic)
-            exclude_condition = Q(id__in=topics_in_weekly_topic)
-            if phone_number.sub_group:
-                actual_topics = Topic.objects.filter(name__in=values_to_filter)
-            else:
-                actual_topics = Topic.objects.exclude(name__in=values_to_filter)
-            topics_not_in_weekly_topic = actual_topics.exclude(exclude_condition)
             if  phone_number.language == 'es':
                 topic_info_not_in_weekly_topic = topics_not_in_weekly_topic.values('id', 'name_es')
                 picklist = {str(topic_info['id']): topic_info['name_es'] for topic_info in topic_info_not_in_weekly_topic}
                 default_topic_id = min(picklist.keys())
                 default_topic_name = picklist[default_topic_id]
+                WeeklyTopic.objects.create(phone_number=phone_number, topic_id=default_topic_id, week_number=week_num)
                 pre_message = f'Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}. Si prefiere un tema diferente, escriba el número del tema que prefiere de esta lista:\n'
                 if topic_info_not_in_weekly_topic.count()<=1:
                     pre_message = f'Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}.\n'
@@ -128,7 +120,7 @@ def send_topic_selection_message():
                 picklist = {str(topic_info['id']): topic_info['name'] for topic_info in topic_info_not_in_weekly_topic}
                 default_topic_id = min(picklist.keys())
                 default_topic_name = picklist[default_topic_id]
-                
+                WeeklyTopic.objects.create(phone_number=phone_number, topic_id=default_topic_id, week_number=week_num)
                 if topic_info_not_in_weekly_topic.count()<=1:
                     pre_message = f'Chat 4 Heart Health is sending you messages over the next few days about {default_topic_name}.\n'
                     message = ""
@@ -138,7 +130,6 @@ def send_topic_selection_message():
                 message = pre_message + message
             picklist_json = json.dumps(picklist)
             retry_send_message_vonage(message,phone_number, route='outgoing_scheduled_topic_selection')
-            WeeklyTopic.objects.create(phone_number=phone_number, topic_id=default_topic_id, week_number=week_num)
             Picklist.objects.create(phone_number=phone_number, context='topic_selection', picklist=picklist_json)
             TextMessage.objects.create(phone_number=phone_number, message=message, route='outgoing_scheduled_topic_selection')
             MessageTracker.objects.update_or_create(phone_number=phone_number,week_no = week_num,defaults={'sent_topic_selection_message': True})
@@ -148,7 +139,7 @@ def send_topic_selection_message():
 
 
 def send_scheduled_message():
-    phone_numbers = PhoneNumber.objects.filter(Q(arm__name__icontains="ai_chat") | Q(arm__name__icontains="control"))
+    phone_numbers = PhoneNumber.objects.filter((Q(arm__name__icontains="ai_chat") | Q(arm__name__icontains="control")) & Q(study_completed=False))
     logger.info(f'Found {phone_numbers.count()} phone numbers')
     for phone_number in phone_numbers:
         try:
@@ -156,7 +147,7 @@ def send_scheduled_message():
                 continue
             week_num,current_weekday = get_week_num_andcurrent_weekday(phone_number.created_at)
             logger.info(f"Current week for {phone_number.id}: {week_num}")
-            if week_num <= 0 or week_num > int(4):
+            if week_num <= 0 or week_num > int(settings.TOTAL_TOPICS):
                 logger.info(f'Skipping {phone_number.id} because it is week {week_num}')
                 continue
             logger.info("fetching weekly_topic_id")
@@ -210,7 +201,7 @@ def send_scheduled_message():
             logger.error(f"Error sending scheduled message to {phone_number.id}: {e}")
 
 def send_goal_message():
-    phone_numbers = PhoneNumber.objects.filter(arm__name__icontains="ai_chat")
+    phone_numbers = PhoneNumber.objects.filter(arm__name__icontains="ai_chat",study_completed=False)
     logger.info(f'Found {phone_numbers.count()} phone numbers with arm name ai_chat')
     for phone_number in phone_numbers:
         try:
@@ -218,7 +209,7 @@ def send_goal_message():
                 continue
             week_num,current_weekday = get_week_num_andcurrent_weekday(phone_number.created_at)
             logger.info(f"Current weekday for {phone_number.id}: {week_num}")
-            if week_num <= 0 or week_num > int(4):
+            if week_num <= 0 or week_num > int(settings.TOTAL_TOPICS):
                 logger.info(f'Skipping {phone_number.id} because it is week {week_num}')
                 continue
             if current_weekday != int(2):
@@ -248,7 +239,7 @@ def send_goal_message():
             logger.error(f"Error sending goal message to {phone_number.id}: {e}") 
 
 def send_goal_feedback():
-    phone_numbers = PhoneNumber.objects.filter(arm__name__icontains="ai_chat")
+    phone_numbers = PhoneNumber.objects.filter(arm__name__icontains="ai_chat",study_completed=False)
     logger.info(f'Found {phone_numbers.count()} phone numbers with arm name ai_chat')
     for phone_number in phone_numbers:
         try:
@@ -256,7 +247,7 @@ def send_goal_feedback():
                 continue
             week_num,current_weekday = get_week_num_andcurrent_weekday(phone_number.created_at)
             logger.info(f"Current weekday for {phone_number.id}: {week_num}")
-            if week_num <= 0 or week_num > int(4):
+            if week_num <= 0 or week_num > int(settings.TOTAL_TOPICS):
                 logger.info(f'Skipping {phone_number.id} because it is week {week_num}')
                 continue
             if current_weekday != int(5):
@@ -290,7 +281,7 @@ final_message_control_es = settings.FINAL_MESSAGE_CONTROL_ES
 final_message = settings.FINAL_MESSAGE
 final_message_es = settings.FINAL_MESSAGE_ES
 def send_final_pilot_message():
-    phone_numbers = PhoneNumber.objects.filter(Q(arm__name__icontains="ai_chat") | Q(arm__name__icontains="control"))
+    phone_numbers = PhoneNumber.objects.filter((Q(arm__name__icontains="ai_chat") | Q(arm__name__icontains="control")) & Q(study_completed=False))
     logger.info(f'Found {phone_numbers.count()} phone numbers')
     for phone_number in phone_numbers:
         try:
@@ -298,7 +289,7 @@ def send_final_pilot_message():
                 continue
             week_num,current_weekday = get_week_num_andcurrent_weekday(phone_number.created_at)
             logger.info(f"Current weekday for {phone_number.id}: {week_num}")
-            if week_num != int(5):
+            if week_num != int(settings.TOTAL_TOPICS)+1:
                 logger.info(f'Skipping {phone_number.id} because it is week {week_num}')
                 continue
             if phone_number.final_pilot_message_sent:
@@ -327,6 +318,8 @@ def send_final_pilot_message():
                 pass
             logger.info(f"Sent final message to {phone_number.id}")
             phone_number.final_pilot_message_sent = True
+            phone_number.save()
+            phone_number.study_completed = True
             phone_number.save()
         except Exception as e:
             logger.error(f"Error sending final message to {phone_number.id}: {e}")

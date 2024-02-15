@@ -220,9 +220,6 @@ def clean_and_determine_text_number_or_stop(received_text):
     # Check if the cleaned text is "stop" (case-insensitive)
     elif cleaned_text.lower() == "stop":
         classification = "stop"
-    elif cleaned_text.lower() == "heart" or cleaned_text.lower() == "yes":
-        classification = "opt_in"
-    # If the text doesn't match "number" or "stop," classify it as "other"
     else:
         classification = "other"
     

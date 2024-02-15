@@ -43,6 +43,7 @@ class PhoneNumber(models.Model):
     name = models.TextField(blank=False, null=False,default="Anonymous",
                             help_text="Enter a first name for this number.")
     name_key = models.BinaryField()
+    study_id = models.CharField(max_length=100, blank=True, null=True)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -53,6 +54,7 @@ class PhoneNumber(models.Model):
     language = models.CharField(max_length=2, blank=True, null=True, default="")
     pre_survey = models.URLField(blank=True, null=True)
     post_survey = models.URLField(blank=True, null=True)
+    study_completed = models.BooleanField(default=False)
     
 
     def __str__(self):
