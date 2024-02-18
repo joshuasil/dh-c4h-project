@@ -25,9 +25,11 @@ hostname = socket.gethostname()
 if 'D2V-SilvasstarMBP' in hostname:
     environment = 'dev'
     print("Running on local machine")
+    DEBUG = True
 else:
     environment = 'prod'
     print("Running on production server")
+    DEBUG = False
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -90,7 +92,7 @@ if environment != "dev":
 SECRET_KEY = os.getenv('SECRET_KEY','django-insecure-mned9+=7!iw3=ly33w_b-fd3g%gja9iy(jb6g%0nrse$5jth$3')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = [
