@@ -50,7 +50,6 @@ class PhoneNumber(models.Model):
     opted_in = models.BooleanField(default=False)
     welcome_sent = models.BooleanField(default=False)
     final_pilot_message_sent = models.BooleanField(default=False)
-    sub_group = models.BooleanField(default=False)
     language = models.CharField(max_length=2, blank=True, null=True, default="")
     pre_survey = models.URLField(blank=True, null=True)
     post_survey = models.URLField(blank=True, null=True)
@@ -237,9 +236,23 @@ class Picklist(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+class SendMessage(models.Model):
+    phone_number = models.ForeignKey(PhoneNumber, on_delete=models.CASCADE)
+    message = models.TextField(blank=False, null=True)
+    route = models.CharField(max_length=100, blank=False, null=False)
+    picklist = models.TextField(blank=True, null=True)
+    week_num = models.PositiveIntegerField(blank=True, null=True)
+    current_weekday = models.PositiveIntegerField(blank=True, null=True)
+    message_tracker_col = models.TextField(blank=True, null=True)
+    default_topic_id = models.PositiveIntegerField(blank=True, null=True)
+    sent = models.BooleanField(default=False)
+    include_name = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
 
 @receiver(post_save, sender=PhoneNumber)
 def create_message_trackers(sender, instance, created, **kwargs):
-    if created and instance.arm.name == "test":
+    if created and ('control' in instance.arm.name.lower() or 'ai_chat' in instance.arm.name.lower()):
         for week_no in range(1, int(settings.TOTAL_TOPICS)+1):  
             MessageTracker.objects.create(phone_number=instance, week_no=week_no)

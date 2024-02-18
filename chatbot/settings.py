@@ -110,13 +110,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'django_apscheduler',
     'base.apps.BaseConfig',
     'import_export',
     'customLogs',
     'django_extensions',
     'rangefilter',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -213,7 +212,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'America/Cambridge_Bay'
+TIME_ZONE = 'America/Denver'
 
 USE_I18N = True
 
@@ -234,10 +233,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
-
-# Add this anywhere below the BASE_DIR setting
-dotenv_path = os.path.join(BASE_DIR, '.env')
-load_dotenv(dotenv_path=dotenv_path)
 
 FREQUENCY_PER_TOPC = os.getenv('FREQUENCY_PER_TOPC', None)
 
@@ -337,16 +332,16 @@ LOGGING = {
 }
 
 
-SCHEDULER_CONFIG = {
-    "apscheduler.jobstores.default": {
-        "class": "django_apscheduler.jobstores:DjangoJobStore"
-    },
-    'apscheduler.executors.processpool': {
-        "type": "threadpool"
-    },
-}
-SCHEDULER_AUTOSTART = True
-SCHEDULER_SETTING = os.environ.get('SCHEDULER_SETTING')
+# SCHEDULER_CONFIG = {
+#     "apscheduler.jobstores.default": {
+#         "class": "django_apscheduler.jobstores:DjangoJobStore"
+#     },
+#     'apscheduler.executors.processpool': {
+#         "type": "threadpool"
+#     },
+# }
+# SCHEDULER_AUTOSTART = True
+# SCHEDULER_SETTING = os.environ.get('SCHEDULER_SETTING')
 
 # WELCOME_MESSAGE = os.getenv('WELCOME_MESSAGE', None)
 OPT_IN_MESSAGE = os.getenv('OPT_IN_MESSAGE', None)
@@ -390,3 +385,9 @@ AWS_SES_SECRET_ACCESS_KEY = os.getenv('AWS_SES_SECRET_ACCESS_KEY')
 EMAIL_BACKEND = 'django_ses.SESBackend'
 AWS_SES_REGION_NAME = 'us-east-1'
 AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
+
+
+############################ Celery ############################
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_TIMEZONE = 'UTC'

@@ -29,16 +29,12 @@ class PhoneNumberForm(forms.ModelForm):
             self.initial['name'] = decrypt_data(self.instance.name, self.instance.name_key)
 
 class ArmAdmin(ImportExportModelAdmin):
-    list_display = ('name', 'phone_numbers_with_subgroups', 'phone_numbers_without_subgroups')
+    list_display = ('name', 'phone_numbers_count')
 
-    def phone_numbers_with_subgroups(self, obj):
-        return PhoneNumber.objects.filter(arm=obj, sub_group=True).count()
+    def phone_numbers_count(self, obj):
+        return PhoneNumber.objects.filter(arm=obj).count()
 
-    def phone_numbers_without_subgroups(self, obj):
-        return PhoneNumber.objects.filter(arm=obj, sub_group=False).count()
-
-    phone_numbers_with_subgroups.short_description = 'Phone Numbers with Subgroups'
-    phone_numbers_without_subgroups.short_description = 'Phone Numbers without Subgroups'
+    phone_numbers_count.short_description = 'Phone Numbers Count'
 
 admin.site.register(Arm, ArmAdmin)
 
@@ -68,9 +64,9 @@ from django.utils.html import format_html
 
 @admin.register(PhoneNumber)
 class PhoneNumberAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'get_decrypted_phone_number', 'arm', 'get_decrypted_name', 'active', 'opted_in', 'created_at', 'sub_group')
+    list_display = ('id', 'get_decrypted_phone_number', 'arm', 'get_decrypted_name', 'active', 'opted_in', 'created_at')
     exclude = ["phone_number_hash"]
-    list_filter = ('arm', 'active', 'opted_in', 'sub_group')
+    list_filter = ('arm', 'active', 'opted_in')
     date_hierarchy = 'created_at'
     ordering = ('-created_at',)
     form = PhoneNumberForm
