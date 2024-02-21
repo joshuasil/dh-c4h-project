@@ -22,7 +22,7 @@ from boto3.session import Session
 
 hostname = socket.gethostname()
 
-if 'D2V-SilvasstarMBP' in hostname:
+if 'd2v-silvasstarmbp' in hostname.lower():
     environment = 'dev'
     print("Running on local machine")
     DEBUG = True
