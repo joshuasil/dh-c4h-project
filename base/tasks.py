@@ -36,7 +36,7 @@ def get_messages():
                     # Example for handling feedback on goals
                     handle_goals_feedback(phone_number, week_num, current_weekday)
 
-                if week_num == 9 and current_weekday == 1:
+                if week_num == (settings.TOTAL_TOPICS + 1) and current_weekday == 1:
                     # Handling for sending final pilot message
                     handle_final_pilot_message(phone_number, week_num, current_weekday)
 
