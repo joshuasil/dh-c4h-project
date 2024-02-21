@@ -4,19 +4,21 @@ from base.task_helpers import *
 from base.send_message_vonage import *
 import json
 from django.db import IntegrityError, transaction
+from django.core.cache import cache
 logger = logging.getLogger(__name__)
 
 
 @shared_task
 def get_messages():
+    count = cache.get('get_messages_count', 0)
     phone_numbers = PhoneNumber.objects.filter(study_completed=False, opted_in=True, active=True)
     logger.info(f"Found {phone_numbers.count()} phone numbers active in the study")
     for phone_number in phone_numbers:
-        week_num, current_weekday = get_week_num_and_current_weekday(phone_number.created_at)
+        week_num, current_weekday = get_week_num_and_current_weekday(phone_number.created_at,count)
         logger.info(f"Phone number {phone_number.id} belongs to arm {phone_number.arm.name} and is in week {week_num} and day {current_weekday}")
 
-        if week_num == 0:
-            logger.info(f'Skipping {phone_number.id} because it is in week {week_num}')
+        if week_num == 0 or current_weekday > 5:
+            logger.info(f'Skipping {phone_number.id} because it is in week {week_num} and day{current_weekday}')
             continue
 
         # Ensuring atomic transactions to avoid partial updates
@@ -45,6 +47,8 @@ def get_messages():
             except Exception as e:
                 logger.error(f"Error processing phone number {phone_number.id}: {e}")
 
+    count += 1
+    cache.set('get_messages_count', count)
     return None
 
 def handle_topic_selection(phone_number, week_num, current_weekday):

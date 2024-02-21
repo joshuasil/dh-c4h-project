@@ -18,24 +18,24 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'getting messages': {
         'task': 'base.tasks.get_messages',
-        'schedule': 60,
+        'schedule': 30,
     },
     'sending topic selection': {
         'task': 'base.tasks.send_topic_selection_message',
-        'schedule': 65,
+        'schedule': 31,
     },
     'sending general messages': {
         'task': 'base.tasks.send_messages',
-        'schedule': 67,
+        'schedule': 33,
     },
     'sending final message': {
         'task': 'base.tasks.send_final_pilot_message',
-        'schedule': 69,
+        'schedule': 35,
     },
-    'updating number time for testing': {
-        'task': 'base.tasks.update_phone_number_created_at',
-        'schedule': 70,
-    },
+    # 'updating number time for testing': {
+    #     'task': 'base.tasks.update_phone_number_created_at',
+    #     'schedule': 70,
+    # },
     
 }
 

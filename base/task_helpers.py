@@ -4,25 +4,50 @@ from datetime import datetime, timezone, timedelta
 from base.models import *
 from .helper_functions import *
 
-def get_week_num_and_current_weekday(created_at):
-    mst = timezone(timedelta(hours=-7))
-    # Convert the datetime to MST
-    created_at = created_at.astimezone(mst)
-    # Get current datetime in UTC
-    now_utc = datetime.now(pytz.utc)
-    # Convert current datetime to the timezone of created_at
-    now_in_created_at_tz = now_utc.astimezone(created_at.tzinfo)
-    # Calculate the difference in days
-    total_days = (now_in_created_at_tz.date() - created_at.date()).days    
-    if total_days <= 0:
-        return 0, 0
+from datetime import datetime, timedelta
+from pytz import timezone
+
+def get_week_num_and_current_weekday(created_at,count=0):
+    """
+    Calculate the number of completed weeks (as full Sundays passed)
+    since the created_at date and the current weekday.
+
+    Parameters:
+    - created_at (datetime.date or datetime.datetime): The date from which to calculate.
+
+    Returns:
+    - tuple: (week_num, current_weekday)
+        - week_num (int): Number of Sundays that have passed since created_at.
+        - current_weekday (int): The current weekday (1 for Monday, ... 7 for Sunday).
+    """
+    # Ensure created_at is a datetime.date object
+    mst = timezone('America/Denver')
+    if isinstance(created_at, datetime):
+        created_at = created_at.astimezone(mst)
+    
+    
+    
+    today = datetime.now(mst) + timedelta(days=count)
+    
+    # Calculate the current weekday (Python's weekday() returns 0 for Monday, so add 1 to match the desired output)
+    current_weekday = today.weekday() + 1
+    
+    # Adjust the calculation for week_num
+    if created_at.weekday() < 6:  # If created_at is not a Sunday
+        # Find the next Sunday after created_at
+        next_sunday = created_at + timedelta(days=(6 - created_at.weekday()))
     else:
-        week_num = total_days // 5 + 1
-        current_weekday = total_days % 5
-        if current_weekday == 0:
-            week_num -= 1
-            current_weekday = 5
-        return week_num, current_weekday
+        # If created_at is Sunday, consider that as the first counting point
+        next_sunday = created_at
+    
+    if today >= next_sunday:
+        # Calculate the number of complete weeks by counting Sundays
+        week_num = (today - next_sunday).days // 7 + 1
+    else:
+        # If today is before the first Sunday after created_at, no complete week has passed
+        week_num = 0
+    
+    return week_num, current_weekday
     
 def get_topic_selection_message(phone_number,week_num):
     topics_in_weekly_topic = WeeklyTopic.objects.filter(phone_number=phone_number).values_list('topic__id', flat=True)

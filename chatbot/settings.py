@@ -54,14 +54,14 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_KMS_ARN = os.getenv('AWS_KMS_ARN')
 AWS_REGION_NAME = os.getenv('AWS_REGION_NAME', 'us-east-1')
 
-WELCOME_MESSAGE_CONTROL = "Your healthcare provider is sending you three messages each week for the next 2 months to help you manage your health. Look for them every couple of days starting next week. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
-WELCOME_MESSAGE_CONTROL_ES = "Su proveedor de atención médica le enviará tres mensajes cada semana durante los próximos 2 meses para ayudarlo a controlar su salud. Búscalos cada dos o tres días a partir de la próxima semana. Para comenzar, complete esta encuesta rápida sobre su salud. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
-WELCOME_MESSAGE="Clinic Chat & Salud welcome you to Chat 4 Heart Health! We'll send you 4-5 messages every few days on different topics to support healthy habits.  You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please answer this survey with questions about your health--if you have already answered this, thank you! We'll start sending you messages shortly."
-WELCOME_MESSAGE_ES="¡Clinic Chat y Salud le da la bienvenida a Chat del Corazón ! Le enviaremos de 4 a 5 mensajes cada pocos días sobre diferentes temas para fomentar hábitos saludables. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte saludable. Todo lo que me preguntes se mantendrá privado. Para comenzar, complete esta encuesta rápida sobre su salud. Si ya has respondido esto, ¡gracias! Si ya has respondido esto, ¡gracias! Le enviaremos mensajes en breve."
-FINAL_MESSAGE_CONTROL = "Salud thanks you for being a part of Chat 4 Heart Health! Please take a few minutes now to complete this quick follow-up survey about your health."
-FINAL_MESSAGE_CONTROL_ES = "¡Salud le agradece por ser parte de Chat del Corazón ! Tómese unos minutos ahora para completar esta rápida encuesta de seguimiento sobre su salud."
-FINAL_MESSAGE = "Salud thanks you for being a part of Chat 4 Heart Health! Feel free to keep chatting with us about healthy habits. Please take a few minutes now to complete this quick follow-up survey about your health."
-FINAL_MESSAGE_ES = "¡Salud le agradece por ser parte de Chat del Corazón ! No dudes en seguir charlando con nosotros sobre hábitos saludables. Tómese unos minutos ahora para completar esta rápida encuesta de seguimiento sobre su salud."
+WELCOME_MESSAGE_CONTROL = "Your healthcare provider is sending you three messages each week for the next 2 months to help you manage your health. Look for them every Monday, Wednesday and Friday starting next week."
+WELCOME_MESSAGE_CONTROL_ES = "Su proveedor de atención médica le enviará tres mensajes cada semana durante los próximos 2 meses para ayudarlo a controlar su salud. Búscalos todos los lunes, miércoles y viernes a partir de la próxima semana."
+WELCOME_MESSAGE="Denver Health welcomes you to Chat 4 Heart Health! Starting Monday, we'll send you 4-5 messages each week for 2 months about things like healthy eating, physical activity & getting a good night's sleep. You will be able ask me questions anytime, day or night and working with me could help you stay healthy. Anything you ask me is kept private. If you prefer messages in Spanish, text '1' here; Si prefieres mensajes en español, envía el mensaje '1' aquí. To get started, please complete this quick survey about your health. "
+WELCOME_MESSAGE_ES="¡Denver Health le da la bienvenida a Chat 4 Heart Health! A partir de Lunes, le enviaremos de 4 a 5 mensajes cada semana durante 2 meses sobre aspectos como alimentación saludable, actividad física y sueño reparador. Podrás hacerme preguntas en cualquier momento, de día o de noche, y trabajar conmigo podría ayudarte a mantenerte saludable. Todo lo que me preguntes se mantendrá privado. Si prefiere mensajes en español, envíe un mensaje de texto con '1' aquí; Si prefieres mensajes en español, envía el mensaje '1' aquí. Para comenzar, complete esta encuesta rápida sobre su salud."
+FINAL_MESSAGE_CONTROL = "Thank you for participating in the Chat for Heart Health study! Please take a moment to complete this survey about your healthy behaviors. It should take you 5 minutes to complete and we will send you $5 when you do."
+FINAL_MESSAGE_CONTROL_ES = "¡Gracias por participar en el estudio Chat for Heart Health! Tómese un momento para completar esta encuesta sobre sus comportamientos saludables. Debería llevarle 5 minutos completarlo y le enviaremos $5 cuando lo haga."
+FINAL_MESSAGE = "Thank you for participating in the Chat for Heart Health study! We will no longer send you messages, but please feel free to ask us questions about your heart health any time! Please take a moment to complete this survey about your healthy behaviors. It should take you 5 minutes to complete and we will send you $5 when you do."
+FINAL_MESSAGE_ES = "¡Gracias por participar en el estudio Chat for Heart Health! Ya no le enviaremos mensajes, pero no dude en hacernos preguntas sobre la salud de su corazón en cualquier momento. Tómese un momento para completar esta encuesta sobre sus comportamientos saludables. Debería llevarle 5 minutos completarlo y le enviaremos $5 cuando lo haga."
 print("WELCOME_MESSAGE: ", WELCOME_MESSAGE)
 print("WELCOME_MESSAGE_ES: ", WELCOME_MESSAGE_ES)
 
@@ -349,7 +349,7 @@ LOGGING = {
 OPT_IN_MESSAGE = os.getenv('OPT_IN_MESSAGE', None)
 OPT_IN_MESSAGE_ES = os.getenv('OPT_IN_MESSAGE_ES', None)
 # WELCOME_MESSAGE_ES = os.getenv('WELCOME_MESSAGE_ES', None)
-TOTAL_TOPICS = os.getenv('TOTAL_TOPICS', 8)
+TOTAL_TOPICS = os.getenv('TOTAL_TOPICS', 9)
 
 SCHEDULE_MESSAGE_HOUR = os.getenv('SCHEDULE_MESSAGE_HOUR', 8)
 SCHEDULE_MESSAGE_MINUTE = os.getenv('SCHEDULE_MESSAGE_MINUTE', 0)

@@ -11,7 +11,7 @@ from django import forms
 # admin.site.register(Arm)
 admin.site.register(Topic)
 # admin.site.register(WeeklyTopic)
-admin.site.register(TopicGoal)
+
 # admin.site.register(MessageTracker)
 
 # admin.site.register(TextMessage)
@@ -111,11 +111,46 @@ class MessageTrackerAdmin(ImportExportModelAdmin):
 
 @admin.register(ScheduledMessage)
 class ScheduleMessageAdmin(ImportExportModelAdmin):
-    pass
+    list_display = ('get_topic_name', 'weekday', 'get_message', 'get_message_es', 'get_picklist')
+    ordering = ('topic_id', 'weekday')
+    def get_topic_name(self, obj):
+        return obj.topic.name
+    get_topic_name.short_description = 'Topic Name'
+
+    def get_message(self, obj):
+        return obj.message[:40] + '...' if obj.message else ''
+    get_message.short_description = 'Message'
+
+    def get_message_es(self, obj):
+        return obj.message_es[:40] + '...' if obj.message_es else ''
+    get_message_es.short_description = 'Message ES'
+
+    def get_picklist(self, obj):
+        return obj.picklist[:40] + '...' if obj.picklist else ''
+    get_picklist.short_description = 'Picklist'
 
 @admin.register(ScheduledMessageControl)
 class ScheduledMessageControlAdmin(ImportExportModelAdmin):
-    pass
+    list_display = ('get_topic_name','weekday', 'get_message', 'get_message_es',)
+    ordering = ('topic_id', 'weekday')
+    def get_topic_name(self, obj):
+        return obj.topic.name
+    get_topic_name.short_description = 'Topic Name'
+
+    def get_message(self, obj):
+        return obj.message[:40] + '...' if obj.message else ''
+    get_message.short_description = 'Message'
+
+    def get_message_es(self, obj):
+        return obj.message_es[:40] + '...' if obj.message_es else ''
+    get_message_es.short_description = 'Message ES'
+
+@admin.register(TopicGoal)
+class TopicGoalAdmin(ImportExportModelAdmin):
+    list_display = ('get_topic_name', 'goal', 'goal_es', 'goal_feedback', 'goal_feedback_es')
+    def get_topic_name(self, obj):
+        return obj.topic.name
+    get_topic_name.short_description = 'Topic Name'
 
 @admin.register(Picklist)
 class PicklistAdmin(ImportExportModelAdmin):
