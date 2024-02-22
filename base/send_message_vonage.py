@@ -29,7 +29,10 @@ def send_message_vonage(message, phone_number, route,include_name):
     logger.info(f"Sending message: {message} to phone number: {phone_number.pk}, route: {route}")
     name = decrypt_data(phone_number.name, phone_number.name_key)
     if message and include_name:
-        message = f"Hi {name}, {message}"
+        if phone_number.language == "es":
+            message = f"Hola {name}, {message}"
+        else:
+            message = f"Hi {name}, {message}"
 
     
     if phone_number.active:

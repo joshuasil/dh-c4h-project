@@ -32,6 +32,10 @@ app.conf.beat_schedule = {
         'task': 'base.tasks.send_final_pilot_message',
         'schedule': 175,
     },
+    'sending final message': {
+        'task': 'base.tasks.send_final_study_survey',
+        'schedule': 179,
+    },
     # 'updating number time for testing': {
     #     'task': 'base.tasks.update_phone_number_created_at',
     #     'schedule': 70,

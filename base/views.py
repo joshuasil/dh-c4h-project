@@ -39,6 +39,7 @@ def inbound_message(request):
 
             try:
                 phone_number = PhoneNumber.objects.get(phone_number_hash=from_number_hash)
+                default_arm = phone_number.arm
                 already_exists = True
             except PhoneNumber.DoesNotExist:
                 default_arm, created = Arm.objects.get_or_create(name="others")
@@ -48,15 +49,15 @@ def inbound_message(request):
             print("created phone number")
             logger.info(f"Message received: {phone_number.id}, {to_number}, {received_text}")
             TextMessage.objects.create(phone_number=phone_number, message=received_text, route="incoming")
-            if received_text.strip().lower() in ["heart", "corazón", "yes"] and not phone_number.opted_in:
+            if received_text.strip().lower() in ["heart", "corazón", "yes"] and not phone_number.opted_in and not already_exists:
                 # phone_number.opted_in = True
                 # phone_number.save()
-                if received_text.strip().lower() in ["heart", "yes"] and not already_exists:
+                if received_text.strip().lower() in ["heart", "yes"]:
                     response = "Thank you for opting for this study. The team is working on setting you up. You will receive a welcome message as soon as you are set up."
-                if received_text.strip().lower() == "corazón" and not already_exists:
+                if received_text.strip().lower() == "corazón":
                     response = "Gracias por optar por este estudio. El equipo está trabajando para configurarlo. Recibirá un mensaje de bienvenida tan pronto como esté configurado."
                     phone_number.language = "es"
-                success = retry_send_message_vonage(response, phone_number, route='outgoing_opt_in')
+                success = retry_send_message_vonage(response, phone_number, route='outgoing_opt_in',include_name=False)
                 TextMessage.objects.create(phone_number=phone_number, message=response, route='outgoing_opt_in')
                 phone_number, _ = PhoneNumber.objects.get_or_create(phone_number="17204001070", defaults={'arm': default_arm})
                 response = f"New number opted in: {from_number}"

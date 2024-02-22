@@ -129,6 +129,9 @@ def handle_final_pilot_message(phone_number, week_num, current_weekday):
             SendMessage.objects.create(phone_number=phone_number, message=message, 
                 route='outgoing_final_pilot_message',week_num=week_num,picklist=None,
                 current_weekday=current_weekday,include_name=include_name)
+            SendMessage.objects.create(phone_number=phone_number, message=phone_number.post_survey, 
+                route='outgoing_post_survey_link',week_num=week_num,picklist=None,
+                current_weekday=current_weekday,include_name=False)
             logger.info(f"SendMessage object created for phone number {phone_number.id}")
             # phone_number.final_pilot_message_sent = True
             # phone_number.save()
@@ -229,4 +232,23 @@ def send_final_pilot_message():
         else:
             logger.error(f"Failed to send final pilot message {message.id}")
     logger.info("Finished send_final_pilot_message task")
+
+@shared_task
+def send_final_study_survey():
+    logger.info("Starting send_final_pilot_message task")
+    scheduled_messages = SendMessage.objects.filter(sent=False,route='outgoing_post_survey_link')
+    logger.info(f"Found {scheduled_messages.count()} scheduled survey links to send")
+    for message in scheduled_messages:
+        logger.info(f"Sending final survey link {message.id} to phone number {message.phone_number.id}")
+        success = retry_send_message_vonage(message.message, message.phone_number, message.route, max_retries=3, retry_delay=5,include_name=message.include_name)
+        if success:
+            logger.info(f"Final pilot message {message.id} sent successfully")
+            message.sent = True
+            message.save()
+            TextMessage.objects.create(phone_number=message.phone_number, message=message.message, route=message.route)
+            PhoneNumber.objects.filter(id=message.phone_number.id).update(final_pilot_message_sent=True,study_completed=True)
+            logger.info(f"PhoneNumber object {message.phone_number.id} updated")
+        else:
+            logger.error(f"Failed to send final survey link {message.id}")
+    logger.info("Finished send_final_study_survey task")
 
