@@ -39,6 +39,7 @@ def inbound_message(request):
 
             try:
                 phone_number = PhoneNumber.objects.get(phone_number_hash=from_number_hash)
+                already_exists = True
             except PhoneNumber.DoesNotExist:
                 default_arm, created = Arm.objects.get_or_create(name="others")
                 phone_number_instance = PhoneNumber(phone_number=from_number, arm=default_arm)
@@ -50,9 +51,9 @@ def inbound_message(request):
             if received_text.strip().lower() in ["heart", "corazón", "yes"] and not phone_number.opted_in:
                 # phone_number.opted_in = True
                 # phone_number.save()
-                if received_text.strip().lower() in ["heart", "yes"] and created:
+                if received_text.strip().lower() in ["heart", "yes"] and not already_exists:
                     response = "Thank you for opting for this study. The team is working on setting you up. You will receive a welcome message as soon as you are set up."
-                if received_text.strip().lower() == "corazón" and created:
+                if received_text.strip().lower() == "corazón" and not already_exists:
                     response = "Gracias por optar por este estudio. El equipo está trabajando para configurarlo. Recibirá un mensaje de bienvenida tan pronto como esté configurado."
                     phone_number.language = "es"
                 success = retry_send_message_vonage(response, phone_number, route='outgoing_opt_in')
