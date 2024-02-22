@@ -74,8 +74,8 @@ def handle_topic_selection(phone_number, week_num, current_weekday):
                     week_num=week_num,picklist=picklist_json,current_weekday=current_weekday,
                     default_topic_id=default_topic_id, message_tracker_col='sent_topic_selection_message')
                 # Mark as sent
-                message_tracker.sent_topic_selection_message = True
-                message_tracker.save()
+                # message_tracker.sent_topic_selection_message = True
+                # message_tracker.save()
                 logger.info(f"Topic selection message sent to {phone_number.id} for week {week_num}")
 
 def handle_goals(phone_number, week_num, current_weekday):
@@ -92,9 +92,9 @@ def handle_goals(phone_number, week_num, current_weekday):
         if message:
             SendMessage.objects.create(
                 phone_number=phone_number, message=message, route='outgoing_scheduled_goal',
-                week_num=week_num,picklist=picklist_json,current_weekday=current_weekday)
-            message_tracker.sent_goal_message = True
-            message_tracker.save()
+                week_num=week_num,picklist=picklist_json,current_weekday=current_weekday,message_tracker_col='sent_goal_message')
+            # message_tracker.sent_goal_message = True
+            # message_tracker.save()
             logger.info(f"Goals message sent to {phone_number.id} for week {week_num}")
 
 def handle_goals_feedback(phone_number, week_num, current_weekday):
@@ -110,9 +110,10 @@ def handle_goals_feedback(phone_number, week_num, current_weekday):
         if message:
             SendMessage.objects.create(
                 phone_number=phone_number, message=message, route='outgoing_goal_feedback',
-                week_num=week_num,picklist=picklist_json,current_weekday=current_weekday)
-            message_tracker.sent_goal_feedback_message = True
-            message_tracker.save()
+                week_num=week_num,picklist=picklist_json,current_weekday=current_weekday,
+                message_tracker_col='sent_goal_feedback_message')
+            # message_tracker.sent_goal_feedback_message = True
+            # message_tracker.save()
             logger.info(f"Goals feedback message sent to {phone_number.id} for week {week_num}")
 
 
@@ -129,8 +130,8 @@ def handle_final_pilot_message(phone_number, week_num, current_weekday):
                 route='outgoing_final_pilot_message',week_num=week_num,picklist=None,
                 current_weekday=current_weekday,include_name=include_name)
             logger.info(f"SendMessage object created for phone number {phone_number.id}")
-            phone_number.final_pilot_message_sent = True
-            phone_number.save()
+            # phone_number.final_pilot_message_sent = True
+            # phone_number.save()
             logger.info(f"Final pilot message sent to {phone_number.id}")
         else:
             logger.warning(f"No message found for phone number {phone_number.id}")
@@ -152,10 +153,10 @@ def handle_scheduled_info_messages(phone_number, week_num, current_weekday):
             SendMessage.objects.create(
                 phone_number=phone_number, message=message, route='outgoing_scheduled_info',
                 week_num=week_num, picklist=picklist_json,current_weekday=current_weekday,
-                include_name=include_name)
+                include_name=include_name, message_tracker_col=message_tracker_col_updated)
             logger.info(f"SendMessage object created for phone number {phone_number.id}")
             # Update the message_tracker to mark the message as sent
-            MessageTracker.objects.filter(phone_number=phone_number, week_no=week_num).update(**{message_tracker_col: True})
+            
             logger.info(f"Scheduled info message sent to {phone_number.id} for week {week_num}, day {current_weekday}")
         else:
             logger.warning(f"No message found for phone number {phone_number.id}")
@@ -176,7 +177,8 @@ def send_messages():
             message.sent = True
             message.save()
             TextMessage.objects.create(phone_number=message.phone_number, message=message.message, route=message.route)
-            MessageTracker.objects.update_or_create(phone_number=message.phone_number,week_no = message.week_num,defaults={message.message_tracker_col: True})
+            MessageTracker.objects.filter(phone_number=message.phone_number, 
+                                          week_no=message.week_num).update(**{message.message_tracker_col: True})
             if message.picklist:
                 Picklist.objects.create(phone_number=message.phone_number, context=message.route, picklist=message.picklist)
                 logger.info(f"Picklist created for message {message.id}")
@@ -198,7 +200,8 @@ def send_topic_selection_message():
             message.sent = True
             message.save()
             TextMessage.objects.create(phone_number=message.phone_number, message=message.message, route=message.route)
-            MessageTracker.objects.update_or_create(phone_number=message.phone_number,week_no = message.week_num,defaults={message.message_tracker_col: True})
+            MessageTracker.objects.filter(phone_number=message.phone_number, 
+                                          week_no=message.week_num).update(**{message.message_tracker_col: True})
             if message.picklist:
                 Picklist.objects.create(phone_number=message.phone_number, context=message.route, picklist=message.picklist)
                 logger.info(f"Picklist created for message {message.id}")
