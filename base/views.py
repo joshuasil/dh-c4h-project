@@ -50,9 +50,9 @@ def inbound_message(request):
             if received_text.strip().lower() in ["heart", "corazón", "yes"] and not phone_number.opted_in:
                 # phone_number.opted_in = True
                 # phone_number.save()
-                if received_text.strip().lower() in ["heart", "yes"]:
+                if received_text.strip().lower() in ["heart", "yes"] and created:
                     response = "Thank you for opting for this study. The team is working on setting you up. You will receive a welcome message as soon as you are set up."
-                if received_text.strip().lower() == "corazón":
+                if received_text.strip().lower() == "corazón" and created:
                     response = "Gracias por optar por este estudio. El equipo está trabajando para configurarlo. Recibirá un mensaje de bienvenida tan pronto como esté configurado."
                     phone_number.language = "es"
                 success = retry_send_message_vonage(response, phone_number, route='outgoing_opt_in')
