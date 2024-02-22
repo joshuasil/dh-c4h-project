@@ -78,7 +78,7 @@ logger_boto3_client = boto3.client(
 
 # Choose the DSN based on the environment
 if environment != "dev":
-    dsn = "https://6dc275ea3d9aee183240bff41b775e5a@o4505835707957248.ingest.sentry.io/4506385741840384"
+    dsn = "https://14488fb05ca96dc073a7ef56ab2c36ea@o4505835707957248.ingest.sentry.io/4506791275003904"
     sentry_sdk.init(
         dsn=dsn,
         traces_sample_rate=1.0,
