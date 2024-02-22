@@ -6,8 +6,9 @@ from .helper_functions import *
 
 from datetime import datetime, timedelta
 from pytz import timezone
-
+logger = logging.getLogger(__name__)
 def get_week_num_and_current_weekday(created_at,count=0):
+    logger.info(f"Day number from cache is {count}")
     """
     Calculate the number of completed weeks (as full Sundays passed)
     since the created_at date and the current weekday.
