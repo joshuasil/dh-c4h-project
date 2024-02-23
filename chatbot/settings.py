@@ -97,7 +97,7 @@ SECRET_KEY = os.getenv('SECRET_KEY','django-insecure-mned9+=7!iw3=ly33w_b-fd3g%g
 CORS_ORIGIN_ALLOW_ALL = True
 
 ALLOWED_HOSTS = [
-'localhost','3.211.47.166','dh-c4h.clinicchat.com','127.0.0.1'
+'localhost','3.211.47.166','dh-c4h.clinicchat.com','127.0.0.1','ec2-3-211-47-166.compute-1.amazonaws.com'
 ]
 
 
@@ -395,3 +395,5 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TIMEZONE = 'America/Denver'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+JOSH_NUMBER = os.getenv('JOSH_NUMBER', None)

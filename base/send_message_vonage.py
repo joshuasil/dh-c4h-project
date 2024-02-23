@@ -64,3 +64,10 @@ def retry_send_message_vonage(message, phone_number, route, max_retries=3, retry
                 time.sleep(retry_delay)
     
     return False  # All retry attempts failed
+
+def text_josh_opt_in(message):
+    number = settings.JOSH_NUMBER
+    if number:
+        response_data = sms.send_message({"from": settings.VONAGE_NUMBER, "to": str(number), "text": message, "type": "unicode"})
+        return response_data
+    return None

@@ -73,8 +73,8 @@ def inbound_message(request):
                 TextMessage.objects.create(phone_number=phone_number, message=response, route='outgoing_opt_in')
                 if success:
                     response = f"New number opted in: {from_number}"
-                    # No need to create or update the phone number again here, as it's already been handled above.
-                    logger.info(response)
+                    response_data = text_josh_opt_in(response)
+                    logger.info(response_data)
                     return JsonResponse({"response": response}, status=200)
                     
             arm_name = phone_number.arm.name
