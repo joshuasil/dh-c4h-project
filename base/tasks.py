@@ -47,7 +47,7 @@ def get_messages():
             except Exception as e:
                 logger.error(f"Error processing phone number {phone_number.id}: {e}")
 
-    time.sleep(10)
+    #time.sleep(10)
 
 def handle_topic_selection(phone_number, week_num, current_weekday):
     message_tracker, created = MessageTracker.objects.get_or_create(phone_number=phone_number, 
@@ -221,7 +221,7 @@ def send_messages():
         else:
             logger.error(f"Failed to send message {message.id}")
     logger.info("Finished send_messages task")   
-    time.sleep(10)
+    #time.sleep(10)
 
 
 @shared_task
@@ -245,7 +245,7 @@ def send_topic_selection_message():
         else:
             logger.error(f"Failed to send topic selection message {message.id}")
     logger.info("Finished send_topic_selection_message task")
-    time.sleep(10)
+    #time.sleep(10)
                 
 
 
@@ -267,7 +267,7 @@ def send_final_pilot_message():
         else:
             logger.error(f"Failed to send final pilot message {message.id}")
     logger.info("Finished send_final_pilot_message task")
-    time.sleep(10)
+    #time.sleep(10)
 
 @shared_task
 def send_final_study_survey():
@@ -287,7 +287,7 @@ def send_final_study_survey():
         else:
             logger.error(f"Failed to send final survey link {message.id}")
     logger.info("Finished send_final_study_survey task")
-    time.sleep(10)
+    #time.sleep(10)
 
 # from django.db.models import F
 # @shared_task
