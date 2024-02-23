@@ -9,11 +9,13 @@ logger = logging.getLogger(__name__)
 from celery import current_app
 
 @shared_task
-def get_messages():
+def get_messages(*args, **kwargs):
+    count = DayNumber.objects.all().first().day_number
+    logger.info(f"Starting get_messages task for future date {count}")
     phone_numbers = PhoneNumber.objects.filter(study_completed=False, opted_in=True, active=True)
     logger.info(f"Found {phone_numbers.count()} phone numbers active in the study")
     for phone_number in phone_numbers:
-        week_num, current_weekday = get_week_num_and_current_weekday(phone_number.created_at)
+        week_num, current_weekday = get_week_num_and_current_weekday(phone_number.created_at,count)
         logger.info(f"Phone number {phone_number.id} belongs to arm {phone_number.arm.name} and is in week {week_num} and day {current_weekday}")
 
         if week_num == 0 or current_weekday > 5:
@@ -201,7 +203,7 @@ def handle_scheduled_info_messages(phone_number, week_num, current_weekday):
                     
 
 @shared_task
-def send_messages():
+def send_messages(*args, **kwargs):
     logger.info("Starting send_messages task")
     scheduled_messages = SendMessage.objects.filter(sent=False,route__in=['outgoing_scheduled_info','outgoing_scheduled_goal','outgoing_goal_feedback'])
     logger.info(f"Found {scheduled_messages.count()} scheduled messages to send")
@@ -225,7 +227,7 @@ def send_messages():
 
 
 @shared_task
-def send_topic_selection_message():
+def send_topic_selection_message(*args, **kwargs):
     logger.info("Starting send_topic_selection_message task")
     scheduled_messages = SendMessage.objects.filter(sent=False,route='outgoing_scheduled_topic_selection')
     logger.info(f"Found {scheduled_messages.count()} scheduled topic selection messages to send")
@@ -250,7 +252,7 @@ def send_topic_selection_message():
 
 
 @shared_task
-def send_final_pilot_message():
+def send_final_pilot_message(*args, **kwargs):
     logger.info("Starting send_final_pilot_message task")
     scheduled_messages = SendMessage.objects.filter(sent=False,route='outgoing_final_pilot_message')
     logger.info(f"Found {scheduled_messages.count()} scheduled final pilot messages to send")
@@ -270,7 +272,7 @@ def send_final_pilot_message():
     time.sleep(10)
 
 @shared_task
-def send_final_study_survey():
+def send_final_study_survey(*args, **kwargs):
     logger.info("Starting send_final_pilot_message task")
     scheduled_messages = SendMessage.objects.filter(sent=False,route='outgoing_post_survey_link')
     logger.info(f"Found {scheduled_messages.count()} scheduled survey links to send")
@@ -289,16 +291,16 @@ def send_final_study_survey():
     logger.info("Finished send_final_study_survey task")
     time.sleep(10)
 
-# from django.db.models import F
-# @shared_task
-# def update_futuredate_testing():
-#     DayNumber.objects.all().update(day_number=F('day_number') + 1)
-#     return None
+from django.db.models import F
+@shared_task
+def update_futuredate_testing(*args, **kwargs):
+    DayNumber.objects.all().update(day_number=F('day_number') + 1)
+    return None
 
 
-# from celery import chain
-# @shared_task
-# def send_messages_chain():
-#     chain(update_futuredate_testing.s(),get_messages.s(), send_topic_selection_message.s(),send_messages.s(), send_final_pilot_message.s(), 
-#           send_final_study_survey.s())()
-#     return None
+from celery import chain
+@shared_task
+def send_messages_chain():
+    chain(update_futuredate_testing.s(),get_messages.s(), send_topic_selection_message.s(),send_messages.s(), send_final_pilot_message.s(), 
+          send_final_study_survey.s())()
+    return None

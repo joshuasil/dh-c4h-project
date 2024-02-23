@@ -39,38 +39,52 @@ def inbound_message(request):
 
             try:
                 phone_number = PhoneNumber.objects.get(phone_number_hash=from_number_hash)
+                logger.info(f"Phone number found: {phone_number.phone_number}")
                 default_arm = phone_number.arm
-                already_exists = True
             except PhoneNumber.DoesNotExist:
+                logger.info(f"Phone number not found, creating new: {from_number}")
                 default_arm, created = Arm.objects.get_or_create(name="others")
-                phone_number_instance = PhoneNumber(phone_number=from_number, arm=default_arm)
-                phone_number_instance.save()
-                phone_number = PhoneNumber.objects.get(phone_number_hash=from_number_hash)
-            print("created phone number")
+                # Directly create a PhoneNumber instance without using get_or_create to avoid IntegrityError
+                phone_number_instance = PhoneNumber(phone_number=from_number, arm=default_arm, phone_number_hash=from_number_hash)
+                try:
+                    phone_number_instance.save()
+                    logger.info(f"New phone number saved: {from_number}")
+                    phone_number = phone_number_instance
+                except IntegrityError as e:
+                    logger.error(f"Error saving phone number: {e}")
+                    # If there's an IntegrityError, it means the phone number already exists, so we fetch it instead.
+                    phone_number = PhoneNumber.objects.get(phone_number_hash=from_number_hash)
+
             logger.info(f"Message received: {phone_number.id}, {to_number}, {received_text}")
             TextMessage.objects.create(phone_number=phone_number, message=received_text, route="incoming")
-            if received_text.strip().lower() in ["heart", "corazón", "yes"] and not phone_number.opted_in and not already_exists:
-                # phone_number.opted_in = True
-                # phone_number.save()
+
+            if received_text.strip().lower() in ["heart", "corazón", "yes"] and not phone_number.opted_in:
+                # Opt-in logic here. Assuming phone_number.opted_in and phone_number.language need to be updated.
+                phone_number.opted_in = True
+                response = ""
                 if received_text.strip().lower() in ["heart", "yes"]:
                     response = "Thank you for opting for this study. The team is working on setting you up. You will receive a welcome message as soon as you are set up."
                 if received_text.strip().lower() == "corazón":
                     response = "Gracias por optar por este estudio. El equipo está trabajando para configurarlo. Recibirá un mensaje de bienvenida tan pronto como esté configurado."
                     phone_number.language = "es"
-                success = retry_send_message_vonage(response, phone_number, route='outgoing_opt_in',include_name=False)
-                TextMessage.objects.create(phone_number=phone_number, message=response, route='outgoing_opt_in')
-                phone_number, _ = PhoneNumber.objects.get_or_create(phone_number="17204001070", defaults={'arm': default_arm})
-                response = f"New number opted in: {from_number}"
-                success = retry_send_message_vonage(response, phone_number, route='outgoing_opt_in')
+                phone_number.save()
+                
+                success = retry_send_message_vonage(response, phone_number, route='outgoing_opt_in', include_name=False)
                 TextMessage.objects.create(phone_number=phone_number, message=response, route='outgoing_opt_in')
                 if success:
+                    response = f"New number opted in: {from_number}"
+                    # No need to create or update the phone number again here, as it's already been handled above.
+                    logger.info(response)
                     return JsonResponse({"response": response}, status=200)
                     
             arm_name = phone_number.arm.name
             logger.info(f"Arm name: {arm_name}")
             if arm_name.lower() == "others":
-                response = "Thank you for your interest in Chat 4 Heart Health! As of right now, you are doing well managing your health so we won't be sending you text messages. If your health care provider suggests you could benefit from our program, we'll start sending you text messages to support healthy behavior. Thanks, and have a great day."
-                success = retry_send_message_vonage(response, phone_number, route='outgoing_other_arm')
+                if phone_number.opted_in:
+                    response = "Thank you for opting for this study. The team is working on setting you up. You will receive a welcome message as soon as you are set up."
+                else:
+                    response = "Thank you for your interest in Chat 4 Heart Health! As of right now, you are doing well managing your health so we won't be sending you text messages. If your health care provider suggests you could benefit from our program, we'll start sending you text messages to support healthy behavior. Thanks, and have a great day."
+                success = retry_send_message_vonage(response, phone_number, route='outgoing_other_arm',include_name=False)
                 if success:
                     TextMessage.objects.create(phone_number=phone_number, message=response, route='outgoing_other_arm')
                     return JsonResponse({"response": response}, status=200)

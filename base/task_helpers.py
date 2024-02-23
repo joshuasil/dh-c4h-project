@@ -7,8 +7,7 @@ from .helper_functions import *
 from datetime import datetime, timedelta
 from pytz import timezone
 logger = logging.getLogger(__name__)
-def get_week_num_and_current_weekday(created_at,count=0):
-    logger.info(f"Day number from cache is {count}")
+def get_week_num_and_current_weekday(created_at):
     """
     Calculate the number of completed weeks (as full Sundays passed)
     since the created_at date and the current weekday.
@@ -28,7 +27,7 @@ def get_week_num_and_current_weekday(created_at,count=0):
     
     
     
-    today = datetime.now(mst) + timedelta(days=count)
+    today = datetime.now(mst)
     
     # Calculate the current weekday (Python's weekday() returns 0 for Monday, so add 1 to match the desired output)
     current_weekday = today.weekday() + 1
@@ -63,12 +62,13 @@ def get_topic_selection_message(phone_number,week_num):
         default_topic_name = picklist[default_topic_id]
         WeeklyTopic.objects.create(phone_number=phone_number, topic_id=default_topic_id, week_number=week_num)
         logger.info(f"Created WeeklyTopic object for phone number {phone_number.id}, topic {default_topic_id}, week {week_num}")
-        pre_message = f'Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}. Si prefiere un tema diferente, escriba el número del tema que prefiere de esta lista:\n'
+        pre_message = f'Chat del Corazón le enviará mensajes esta semana sobre {default_topic_name}. Si prefiere un tema diferente, escriba el número del tema que prefiere de esta lista:\n'
         if topic_info_not_in_weekly_topic.count()<=1:
-            pre_message = f'Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}.\n'
+            pre_message = f'Chat del Corazón le enviará mensajes esta semana sobre {default_topic_name}.\n'
             message = ""
         else:
-            pre_message = f'Chat del Corazón le enviará mensajes en los próximos días sobre una {default_topic_name}. Si prefiere un tema diferente, escriba el número del tema que prefiere de esta lista:\n'
+            pre_message = f'Chat del Corazón le enviará mensajes esta semana sobre {default_topic_name}. Si prefiere un tema diferente, escriba el número del tema que prefiere de esta lista:\n'
+            
             message = '\n'.join([f"{topic_id}. {topic_name}" for topic_id, topic_name in picklist.items() if topic_id != min(picklist.keys())])
         message = pre_message + message
     else:

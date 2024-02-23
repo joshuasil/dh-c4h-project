@@ -97,7 +97,7 @@ class PhoneNumber(models.Model):
 
 
         # Check if opted_in has been changed to True
-        if self.pk is not None:
+        if self.pk is not None and self.arm.name != "others":
             orig = PhoneNumber.objects.get(pk=self.pk)
             if self.opted_in and not self.welcome_sent:
                 if self.language == "es" and self.arm.name == "control":
@@ -114,7 +114,7 @@ class PhoneNumber(models.Model):
                     success = retry_send_message_vonage(message, self, "sending welcome message", max_retries=3, retry_delay=5,include_name=False)
                 
                 TextMessage.objects.create(phone_number=self, message=message, route="sending welcome message")
-                time.sleep(5)
+                time.sleep(10)
                 if self.pre_survey:
                     message = self.pre_survey
                     success = retry_send_message_vonage(message, self, "sending pre survey link", max_retries=3, retry_delay=5,include_name=False)
@@ -256,3 +256,7 @@ def create_message_trackers(sender, instance, created, **kwargs):
     if created and ('control' in instance.arm.name.lower() or 'ai_chat' in instance.arm.name.lower()):
         for week_no in range(1, int(settings.TOTAL_TOPICS)+1):  
             MessageTracker.objects.create(phone_number=instance, week_no=week_no)
+
+
+class DayNumber(models.Model):
+    day_number = models.PositiveIntegerField()

@@ -26,6 +26,7 @@ if 'd2v-silvasstarmbp' in hostname.lower():
     environment = 'dev'
     print("Running on local machine")
     DEBUG = True
+    NGROK = True
 else:
     environment = 'prod'
     print("Running on production server")
@@ -99,6 +100,8 @@ ALLOWED_HOSTS = [
 'localhost','3.211.47.166','dh-c4h.clinicchat.com','127.0.0.1'
 ]
 
+if NGROK:
+    ALLOWED_HOSTS.append('68c2-107-165-178-169.ngrok-free.app')
 
 # Application definition
 
@@ -394,3 +397,7 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TIMEZONE = 'America/Denver'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+
+
+FUTURE_DATE = 0
