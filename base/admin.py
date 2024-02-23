@@ -73,13 +73,19 @@ class PhoneNumberAdmin(ImportExportModelAdmin):
     list_per_page = 15
 
     def get_decrypted_phone_number(self, obj):
-        decrypted_phone_number = decrypt_data(obj.phone_number, obj.phone_number_key.tobytes())
-        return format_html('<span>{}</span>', decrypted_phone_number)
+        if obj.phone_number:
+            decrypted_phone_number = decrypt_data(obj.phone_number, obj.phone_number_key.tobytes())
+            return format_html('<span>{}</span>', decrypted_phone_number)
+        else:
+            return format_html('<span>{}</span>', '')
     get_decrypted_phone_number.short_description = 'Phone Number' 
 
     def get_decrypted_name(self, obj):
-        decrypted_name = decrypt_data(obj.name, obj.name_key.tobytes())
-        return format_html('<span>{}</span>', decrypted_name)
+        if obj.name:
+            decrypted_name = decrypt_data(obj.name, obj.name_key.tobytes())
+            return format_html('<span>{}</span>', decrypted_name)
+        else:
+            return format_html('<span>{}</span>', '')
     get_decrypted_name.short_description = 'Name'
 
 @admin.register(WeeklyTopic)

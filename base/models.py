@@ -76,8 +76,8 @@ class PhoneNumber(models.Model):
         super().validate_unique(exclude)
         current_phone_number_hash = hashlib.sha256(self.phone_number.encode()).hexdigest()
         existing = self.__class__.objects.filter(phone_number_hash=current_phone_number_hash)
-        # if self.pk:
-        #     existing = existing.exclude(pk=self.pk)
+        if self.pk:
+            existing = existing.exclude(pk=self.pk)
         if existing.exists():
             raise ValidationError({
                 'phone_number': ValidationError(
