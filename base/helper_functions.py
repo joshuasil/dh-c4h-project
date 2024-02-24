@@ -539,10 +539,17 @@ def get_prediction_azure(text, language, phone_number):
     # Get the corresponding probabilities
     if language == 'en':
         top_dialogs = [intent_dict[intent] for intent in top_intents][:3]
-        response_text = 'Are you asking about: \n' + ('\n'.join([f'{i + 1}. {intent}' for i, intent in enumerate(top_dialogs)]))
+        if len(top_dialogs) == 0:
+            response_text, numbered_intents_dict = get_prediction_render(text, language, phone_number)
+        else:
+            response_text = 'Are you asking about: \n' + ('\n'.join([f'{i + 1}. {intent}' for i, intent in enumerate(top_dialogs)]))
+        
     else:
         top_dialogs = [intent_dict_es[intent] for intent in top_intents]
-        response_text = '¿Estás preguntando sobre: \n' + ('\n'.join([f'{i + 1}. {intent}' for i, intent in enumerate(top_dialogs)]))
+        if len(top_dialogs) == 0:
+            response_text, numbered_intents_dict = get_prediction_render(text, language, phone_number)
+        else:
+            response_text = '¿Estás preguntando sobre: \n' + ('\n'.join([f'{i + 1}. {intent}' for i, intent in enumerate(top_dialogs)]))
     
     # Log the model prediction results
     logger.info(f"Model prediction used for {text}. Top intents: {top_intents}")
