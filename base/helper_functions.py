@@ -414,11 +414,11 @@ def update_context_response(integer_value, context, key_value, phone_number, lan
     numbered_intents_dict = {}
     numbered_dialog = ""
     logger.info(f"Updating context response for context: '{context}'")
-    if context == "topic_selection":
+    if context == "outgoing_scheduled_topic_selection":
         response = get_response_for_number_topic_selection(phone_number, integer_value,key_value)
-    elif context == "goal_setting":
+    elif context == "outgoing_scheduled_goal":
         response = get_response_for_number_goal_setting(phone_number, integer_value,key_value)
-    elif context == "goal_feedback":
+    elif context == "outgoing_goal_feedback":
         response = get_response_for_number_goal_feedback(phone_number, integer_value,key_value)
     elif context == "language_selector":
         response = get_response_for_number_language_selector(phone_number, integer_value,key_value)
