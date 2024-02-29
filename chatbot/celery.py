@@ -32,22 +32,22 @@ app.conf.beat_schedule = {
     'sending topic selection': {
         'task': 'base.tasks.send_topic_selection_message',
         # Runs immediately after 'getting messages', before other tasks
-        'schedule': crontab(day_of_week=1, hour=9, minute=0),
+        'schedule': crontab(day_of_week=1, hour=9, minute='0,15'),
     },
     'sending general messages': {
         'task': 'base.tasks.send_messages',
         # Ensures it runs after 'sending topic selection'
-        'schedule': crontab(hour='10,11', minute=0),
+        'schedule': crontab(hour=10, minute='0,10'),
     },
     'sending final message': {
         'task': 'base.tasks.send_final_pilot_message',
         # Scheduled after 'sending general messages'
-        'schedule': crontab(hour=10, minute=15),
+        'schedule': crontab(hour=10, minute='15,18'),
     },
     'sending final study survey': {
         'task': 'base.tasks.send_final_study_survey',
         # Scheduled last among these tasks, after 'sending final message'
-        'schedule': crontab(hour=10, minute=16),
+        'schedule': crontab(hour=10, minute='16,19'),
     },
 }
 
