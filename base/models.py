@@ -19,6 +19,7 @@ welcome_message = settings.WELCOME_MESSAGE
 welcome_message_es = settings.WELCOME_MESSAGE_ES
 welcome_message_control = settings.WELCOME_MESSAGE_CONTROL
 welcome_message_control_es = settings.WELCOME_MESSAGE_CONTROL_ES
+
 class Arm(models.Model):
     name = models.CharField(max_length=100, unique=True, blank=False)
     description = models.TextField(blank=True, null=True)

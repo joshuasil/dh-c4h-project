@@ -37,7 +37,7 @@ app.conf.beat_schedule = {
     'sending general messages': {
         'task': 'base.tasks.send_messages',
         # Ensures it runs after 'sending topic selection'
-        'schedule': crontab(hour=10, minute=0),
+        'schedule': crontab(hour='10,11', minute=0),
     },
     'sending final message': {
         'task': 'base.tasks.send_final_pilot_message',
